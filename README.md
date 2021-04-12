@@ -10,8 +10,10 @@ modules (e.g. the RPS module).
 
 ## Installation
 
-Acquire the latest PIP distribution for your operating system. Now install all
-python package dependencies for voidphone_pytest by executing
+Install Python3 for your operating system.
+
+Now acquire the latest PIP distribution for your operating system. Now install
+all python package dependencies for voidphone_pytest by executing
 
     `pip install -r requirements.txt`
 
@@ -48,4 +50,10 @@ connecting clients.
 ## Usage
 
 Please invoke the scripts with the `-h` option to display the respective
-invocation syntax and required parameters.
+invocation syntax and required parameters, like
+
+    `python3 dht_client.py -h`
+
+or
+
+    `./dht_client.py -h`
