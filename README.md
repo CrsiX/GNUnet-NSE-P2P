@@ -52,8 +52,8 @@ connecting clients.
 Please invoke the scripts with the `-h` option to display the respective
 invocation syntax and required parameters, like
 
-    `python3 dht_client.py -h`
+    python3 dht_client.py -h
 
 or
 
-    `./dht_client.py -h`
+    ./dht_client.py -h
