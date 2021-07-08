@@ -19,7 +19,7 @@ def sync_read_message(s, fail_reason="Server closed the connection"):
     try:
         msizebuf = s.recv(2)
         buflen = struct.unpack(">H", msizebuf)[0]
-        buf = msizebuf + s.recv(buflen)
+        buf = msizebuf + s.recv(buflen - 2)
     except Exception as e:
         if msizebuf != b'':
             sync_bad_packet(buf, s, str(e))
