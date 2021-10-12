@@ -121,7 +121,8 @@ def main():
     if args.address is not None:
         host = args.address
     if args.port is not None:
-        host = int(args.port)
+        port = int(args.port)
+
 
     if args.firstpeer is not None:
         if (args.firstports is None) or (args.firstkey is None):
