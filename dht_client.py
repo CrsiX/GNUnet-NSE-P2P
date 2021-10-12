@@ -138,7 +138,7 @@ def main():
         if args.get:
             success = send_get(s, key)
 
-        if args.cont is None:
+        if args.cont is False:
             break
 
         input("Press enter to send next request iteration")
