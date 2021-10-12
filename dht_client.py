@@ -74,7 +74,7 @@ def send_put(s, dht_key, dht_value):
     return True
 
 def get_socket(host, port):
-    print(f"Trying to connect to {target_ip}:{target_port}")
+    print(f"Trying to connect to {host}:{port}")
     s = socket.socket(socket.AF_INET, type=socket.SOCK_STREAM)
     s.connect((host, port))
     return s
