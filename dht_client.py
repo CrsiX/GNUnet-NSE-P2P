@@ -73,9 +73,10 @@ def send_put(s, dht_key, dht_value):
 
     return True
 
-def get_socket():
+def get_socket(host, port):
+    print(f"Trying to connect to {target_ip}:{target_port}")
     s = socket.socket(socket.AF_INET, type=socket.SOCK_STREAM)
-    s.connect((target_ip, target_port))
+    s.connect((host, port))
     return s
 
 def main():
@@ -107,7 +108,7 @@ def main():
         host = args.address
 
     if args.port is not None:
-        port = args.port
+        port = int(args.port)
 
     if args.key is not None:
         key = bytes(args.key, encoding='utf-8')
@@ -118,17 +119,19 @@ def main():
         if len(args.data) >= 1:
             value = bytes(args.data, encoding='utf=8')
 
-    s = get_socket()
+    s = get_socket(host, port)
     print(f"[+] Connected to {host}:{port}")
 
     while True:
+        success = False
+
         if args.set:
             success = send_put(s, key, value)
             time.sleep(0.5)
 
             if HOST_DISCONNECTS or not success:
                 s.close()
-                s = get_socket()
+                s = get_socket(host, port)
                 success = True
                 print(f"[+] Connected to {host}:{port}")
 
@@ -142,7 +145,7 @@ def main():
 
         if HOST_DISCONNECTS or not success:
             s.close()
-            s = get_socket()
+            s = get_socket(host, port)
             success = True
             print(f"[+] Connected to {host}:{port}")
 
