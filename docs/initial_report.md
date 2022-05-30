@@ -63,7 +63,7 @@ One such example is `sqlalchemy`, which would provide us with a pretty simple to
 [AGPLv3](https://choosealicense.com/licenses/agpl-3.0/) since it's the strongest copyleft license out there (we would go for GPLv3 if this wasn't a network service).
 It allows anyone to read, edit, study and redistribute our code under the same license while prohibiting closed-source software builds.
 
-We found this to be most adequate for our project, as it should be an open-source software for testing and understanding P2P-networks and the NSE algorithm in detail. Therefore anyone should be able to read and redistribute the code for demonstration or study purposes, but not for private closed-source systems.
+We found this to be the most adequate licence for our project, as it should be an open-source software for testing and understanding P2P-networks and the NSE algorithm in detail. Therefore anyone should be able to read and redistribute the code for demonstration or study purposes, but not for private closed-source systems.
 
 ## Previous programming experience
 
