@@ -16,7 +16,9 @@ Chosen module: NSE
 ## Implementation
 
 As for our implementation we chose the **GNUnet NSE** algorithm, as described in the lecture.
+
 Even though other implementations like **Gossip** could provide a more accurate estimate, one key focus of the project should also be it's resistance to potential attacks or malicious participants, which is not the case for **Gossip** or **Sampling**. As the **GNUnet NSE** algorithm has a **proof of work** algorithm implemented, it secures itself against many attacks like **denial of service**.
+
 Futhermore it provides better runtimes for many aspects, as stated in the lecture slides. Therefore we think the GNUnet algorithm is the best choice for our project.
 
 ## OS & Programming Language
@@ -29,7 +31,7 @@ We know of certain limitations of that language, e.g. the slow speed (compared t
 
 ## Build system
 
-This is not required for Python.
+Build systems are not required for Python, as the language is interpreted instead of compiled.
 
 ## Intended measures to guarantee quality of software
 
@@ -61,6 +63,8 @@ One such example is `sqlalchemy`, which would provide us with a pretty simple to
 [AGPLv3](https://choosealicense.com/licenses/agpl-3.0/) since it's the strongest copyleft license out there (we would go for GPLv3 if this wasn't a network service).
 It allows anyone to read, edit, study and redistribute our code under the same license while prohibiting closed-source software builds.
 
+We found this to be most adequate for our project, as it should be an open-source software for testing and understanding P2P-networks and the NSE algorithm in detail. Therefore anyone should be able to read and redistribute the code for demonstration or study purposes, but not for private closed-source systems.
+
 ## Previous programming experience
 
 1. Luis (4. Bachelor Informatics)
@@ -77,6 +81,6 @@ It allows anyone to read, edit, study and redistribute our code under the same l
 ## Planned workload distribution
 
 The goal is to achieve relatively equally distributed workloads.
-Luis may work more on documenting and testing, while Chris may work more on developing.
-Design choices should always be discussed with both team members.
+However, as Luis is not that experienced in Python yet, he may work more on documenting and testing, while Chris may work more on developing. Eventually both team members should have participated in all parts of the project nonetheless.
+Design choices should always be discussed with both team members so there are no missunderstanding among the team.
 Of course, the code base and program logic should be understood by both team members, otherwise documenting or testing wouldn't be reasonable possible.
