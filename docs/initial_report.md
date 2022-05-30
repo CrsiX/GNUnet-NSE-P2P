@@ -2,7 +2,7 @@
 
 ## Information
 
-Team name: **TBD**
+Team name: NSE-5
 
 GitLab repository: [`NSE-5`](https://gitlab.lrz.de/netintum/teaching/p2psec_projects_2022/NSE-5)
 
@@ -15,7 +15,9 @@ Chosen module: NSE
 
 ## Implementation
 
-**TBD**
+As for our implementation we chose the **GNUnet NSE** algorithm, as described in the lecture.
+Even though other implementations like **Gossip** could provide a more accurate estimate, one key focus of the project should also be it's resistance to potential attacks or malicious participants, which is not the case for **Gossip** or **Sampling**. As the **GNUnet NSE** algorithm has a **proof of work** algorithm implemented, it secures itself against many attacks like **denial of service**.
+Futhermore it provides better runtimes for many aspects, as stated in the lecture slides. Therefore we think the GNUnet algorithm is the best choice for our project.
 
 ## OS & Programming Language
 
