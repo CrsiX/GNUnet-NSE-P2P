@@ -7,6 +7,7 @@ import configparser
 
 DEFAULT_SECTION = "_default"
 GLOBAL_SECTION = "_global"
+DEFAULT_CONFIG_FILE = "config.ini"
 
 
 def load_configuration(filenames: list[str]) -> dict[str, dict[str, str]]:
@@ -17,7 +18,7 @@ def load_configuration(filenames: list[str]) -> dict[str, dict[str, str]]:
     section, those entries are listed below a global section :var:`GLOBAL_SECTION`.
 
     :param filenames: list of filenames to search for
-    :return: dictionary of sections to key-value pairs
+    :return: dictionary of sections of key-value pairs
     """
 
     try:
