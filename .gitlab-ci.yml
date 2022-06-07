@@ -8,7 +8,6 @@ stages:
 before_script:
   - cat /etc/os-release
   - python --version
-  - pip install venv
   - python -m venv venv
   - source venv/bin/activate
 
