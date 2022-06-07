@@ -1,0 +1,62 @@
+image: python:latest
+
+stages:
+  - build
+  - lint
+  - test
+
+before_script:
+  - cat /etc/os-release
+  - python --version
+  - pip install venv
+  - python -m venv venv
+  - source venv/bin/activate
+
+build:
+  stage: build
+  script:
+    - pip install -r requirements.txt
+    - python -m p2p_nse5 -h
+
+flake8:
+  stage: lint
+  script:
+    - pip install -r requirements.txt
+    - pip install flake8
+    - flake8 p2p_nse5 --count --select=E9,F63,F7,F82 --show-source --statistics
+    - flake8 p2p_nse5 --count --doctests --max-complexity=15 --max-line-length=120 --statistics
+
+pylint:
+  stage: lint
+  script:
+    - pip install -r requirements.txt
+    - pip install pylint
+    - pylint p2p_nse5 -j 0 -r y --min-similarity-lines 8 --logging-format-style new --max-args 6 && echo "OK" || echo "FAIL"
+
+unittest-3.10-bullseye:
+  stage: test
+  image: python:3.10-bullseye
+  script:
+    - pip install -r requirements.txt
+    - python -m tests -v
+
+unittest-3.10-alpine:
+  stage: test
+  image: python:3.10-alpine
+  script:
+    - pip install -r requirements.txt
+    - python -m tests -v
+
+unittest-3.9-bullseye:
+  stage: test
+  image: python:3.9-bullseye
+  script:
+    - pip install -r requirements.txt
+    - python -m tests -v
+
+unittest-3.9-alpine:
+  stage: test
+  image: python:3.9-alpine
+  script:
+    - pip install -r requirements.txt
+    - python -m tests -v
