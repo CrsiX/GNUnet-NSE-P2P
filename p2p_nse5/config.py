@@ -25,7 +25,7 @@ def load_configuration(filenames: list[str]) -> dict[str, dict[str, str]]:
         config = configparser.ConfigParser(default_section=DEFAULT_SECTION)
         config.read(filenames)
         return {k: dict(v) for k, v in config.items() if k != DEFAULT_SECTION}
-    except configparser.MissingSectionHeaderError:
+    except configparser.MissingSectionHeaderError as exc:
         for filename in filenames:
             if not os.path.exists(filename):
                 continue
@@ -34,5 +34,4 @@ def load_configuration(filenames: list[str]) -> dict[str, dict[str, str]]:
             config = configparser.ConfigParser(default_section=DEFAULT_SECTION)
             config.read_string(f"[{GLOBAL_SECTION}]{os.linesep}{content}", filename)
             return {k: dict(v) for k, v in config.items() if k != DEFAULT_SECTION}
-        else:
-            raise RuntimeError("No configuration file found")
+        raise RuntimeError("No configuration file found") from exc

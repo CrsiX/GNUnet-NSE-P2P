@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import argparse
 import os
+import sys
+import argparse
 
 from . import config
 
@@ -31,4 +32,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    exit(main())
+    sys.exit(main())
