@@ -32,6 +32,22 @@ pylint:
     - pip install pylint
     - pylint p2p_nse5 -j 0 -r y --min-similarity-lines 8 --logging-format-style new --max-args 6 && echo "OK" || echo "FAIL"
 
+coverage:
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - pip install coverage
+    - coverage run -m tests -v
+    - coverage report
+    - coverage json
+    - coverage lcov
+    - coverage xml
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - coverage.*
+      - htmlcov
+
 unittest-3.10-bullseye:
   stage: test
   image: python:3.10-bullseye
