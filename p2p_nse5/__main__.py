@@ -8,11 +8,6 @@ from . import config
 
 
 def main() -> int:
-    def existing_filename(arg: str) -> str:
-        if os.path.exists(arg):
-            return arg
-        raise ValueError(f"File not found: {arg!r}")
-
     parser = argparse.ArgumentParser(
         prog="p2p_nse5",
         description=__doc__,
@@ -23,10 +18,17 @@ def main() -> int:
         help=f"configuration filename (defaults to {config.DEFAULT_CONFIG_FILE!r})",
         dest="config",
         default=config.DEFAULT_CONFIG_FILE,
-        type=existing_filename,
         metavar="<file>"
     )
-    parser.parse_args()
+
+    commands = parser.add_subparsers(title="commands", dest="command", required=True)
+    commands.add_parser("run")
+    commands.add_parser("config")
+
+    args = parser.parse_args()
+    if not os.path.exists(args.config):
+        parser.error(f"config file {args.config!r} not found, please use command 'config' to create one")
+        return 2
 
     return 0
 
