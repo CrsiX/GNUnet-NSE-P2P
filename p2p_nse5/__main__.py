@@ -2,33 +2,38 @@
 
 import os
 import sys
-import argparse
+import shutil
 
-from . import config
+from . import config, utils
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        prog="p2p_nse5",
-        description=__doc__,
-        epilog="Licensed under AGPLv3."
-    )
-    parser.add_argument(
-        "-c",
-        help=f"configuration filename (defaults to {config.DEFAULT_CONFIG_FILE!r})",
-        dest="config",
-        default=config.DEFAULT_CONFIG_FILE,
-        metavar="<file>"
-    )
-
-    commands = parser.add_subparsers(title="commands", dest="command", required=True)
-    commands.add_parser("run")
-    commands.add_parser("config")
-
+    parser = utils.get_cli_parser()
     args = parser.parse_args()
-    if not os.path.exists(args.config):
-        parser.error(f"config file {args.config!r} not found, please use command 'config' to create one")
-        return 2
+
+    if args.command == "run":
+        if not os.path.exists(args.config):
+            parser.error(f"config file {args.config!r} not found, please use command 'config' to create one")
+            return 2
+
+        try:
+            conf = config.load_configuration([args.config])
+        except Exception:
+            parser.print_usage(sys.stderr)
+            raise
+
+    elif args.command == "config":
+        if not args.force and os.path.exists(args.config):
+            parser.error(f"config file {args.config!r} already exists, force overwriting it with option '-f'")
+            return 2
+        shutil.copy(
+            os.path.abspath(os.path.join(
+                os.path.split(sys.modules["p2p_nse5"].__loader__.path)[0],
+                config.DEFAULT_CONFIG_INI_PATH
+            )),
+            args.config
+        )
+        print(f"A new configuration file has been created as {args.config!r}.")
 
     return 0
 
