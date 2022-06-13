@@ -95,5 +95,5 @@ sphinx:
   artifacts:
     expire_in: 3 days
     paths:
-      - build/html
-      - build/latex/*.pdf
+      - sphinx/build/html
+      - sphinx/build/latex/*.pdf
