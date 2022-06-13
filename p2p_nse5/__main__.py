@@ -17,7 +17,7 @@ def main() -> int:
             return 2
 
         try:
-            conf = config.load_configuration([args.config])
+            _ = config.load_configuration([args.config])  # TODO: Use the loaded configuration in the rest of the app
         except Exception:
             parser.print_usage(sys.stderr)
             raise
