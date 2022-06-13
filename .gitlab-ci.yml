@@ -90,7 +90,8 @@ sphinx:
     - pip install -r requirements.txt
     - make help
     - make html
-    - make pdf
+    - make latexpdf
+    - make latexpdf
   artifacts:
     expire_in: 3 days
     paths:
