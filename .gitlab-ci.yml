@@ -85,6 +85,7 @@ sphinx:
     - apt install -y texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-xetex texlive-luatex texlive-pictures tex-gyre latexmk texlive-lang-english texlive-lang-german texlive-lang-greek
     - deactivate
     - cd sphinx
+    - python -m venv venv
     - source venv/bin/activate
     - pip install -r requirements.txt
     - make help
