@@ -4,6 +4,7 @@ stages:
   - build
   - lint
   - test
+  - docs
 
 before_script:
   - cat /etc/os-release
@@ -76,3 +77,20 @@ unittest-3.9-alpine:
   script:
     - pip install -r requirements.txt
     - python -m tests -v
+
+sphinx:
+  stage: docs
+  script:
+    - sudo apt install -y texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-xetex texlive-luatex texlive-pictures tex-gyre latexmk texlive-lang-english texlive-lang-german texlive-lang-greek
+    - deactivate
+    - cd sphinx
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+    - make help
+    - make html
+    - make pdf
+  artifacts:
+    expire_in: 3 days
+    paths:
+      - build/html
+      - build/latex/*.pdf
