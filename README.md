@@ -18,10 +18,10 @@
    ```
 5. Create a sample configuration file:
    ```shell
-   python3 -m p2p_nse5 config
+   python3 -m p2p_nse5 -c <PATH_TO_CONFIG_FILE> config
    ```
 6. Edit the newly created configuration file to fit your setup.
 7. Run the NSE module:
    ```shell
-   python3 -m p2p_nse5 run -c <PATH_TO_CONFIG_FILE>
+   python3 -m p2p_nse5 -c <PATH_TO_CONFIG_FILE> run
    ```
