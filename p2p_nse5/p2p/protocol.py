@@ -9,12 +9,38 @@ from Crypto.Signature import pss
 from Crypto.Hash import SHA512
 
 
+# Protocol structure:
+# 1 byte    | header code (static `0x42`)
+# 1 byte    | hop count (updated at each relaying peer)
+# 2 bytes   | length of the RSA public key in bytes (see below)
+# 4 bytes   | proximity in bits
+# 8 bytes   | time of the round
+# 8 bytes   | random sample data for the proof of work
+# var bytes | RSA public key in DEM binary format
+# 512 bytes | 4096-bit RSA signature of everything except the first 2 bytes
 PROTOCOL_HEADER = struct.Struct("!cBHLQQ")
 HASHED_HEADER = struct.Struct("!HLQQ")
+HEADER_CODE = b"*"
+HEADER_LENGTH = 24
+SIGNATURE_LENGTH = 512
 
 DEFAULT_HOP_COUNT = 64
 DEFAULT_PROOF_OF_WORK_BITS = 19  # TODO: Check which number of PoW bits is sufficient for the network
 HASH_ENDIAN = "big"
+
+
+class ProtocolMessage:
+    round_time: int
+    proximity: int
+    public_key: RSA.RsaKey
+
+    def __init__(self, round_time: int, proximity: int, public_key: RSA.RsaKey):
+        self.round_time = round_time
+        self.proximity = proximity
+        self.public_key = public_key
+
+    def __repr__(self):
+        return f"ProtocolMessage({', '.join(f'{k}={getattr(self, k)!r}' for k in dir(self) if not k.startswith('_'))})"
 
 
 def build_message(
