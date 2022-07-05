@@ -4,6 +4,7 @@ import struct
 import hashlib
 import logging
 import dataclasses
+from typing import Union
 
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pss
@@ -40,6 +41,41 @@ class ProtocolMessage:
 def _check_proof_of_work(required_bits: int, body: bytes) -> bool:
     h = hashlib.sha256(body).digest()
     return int.from_bytes(h[-math.ceil(required_bits / 8):], HASH_ENDIAN) % (1 << required_bits) == 0
+
+
+def calculate_proximity(rsa_key: RSA.RsaKey, value: Union[int, bytes]) -> int:
+    """
+    Determine the proximity as number of equal leading bits between the
+    RSA public key's N and some comparison value's unsalted SHA256 hash
+
+    :param rsa_key: RSA public key of at least 1024 bits size
+    :param value: some comparison value, usually a representation of the round time
+    :return: number of equal leading bits between the hashed value and the public key
+    """
+
+    # Convert possibly large integer values to big endian bytearrays
+    if isinstance(value, int):
+        ba = bytearray()
+        while value > 255:
+            ba.append(value % 256)
+            value = value >> 8
+        ba.append(value)
+        value = bytes(ba)
+    elif not isinstance(value, bytes):
+        raise TypeError(f"Expected bytes or int, not {type(value)}")
+    h_ = int.from_bytes(hashlib.sha256(value).digest(), HASH_ENDIAN)
+
+    # Using binary representations and string operations is hacky but easy
+    n = bin(rsa_key.public_key().n)[2:]
+    h = bin(h_)[2:]
+    while len(h) < 256:
+        h = "0" + h
+    c = 0
+    proximity = 0
+    while c < 256 and h[c] == n[c]:
+        proximity += 1
+        c += 1
+    return proximity
 
 
 def build_message(
@@ -97,7 +133,8 @@ def unpack_message(msg: bytes, min_proximity: int = None, proof_of_work_bits: in
     :return: the unpacked message as a ProtocolMessage instance
     :raises ValueError: whenever something is wrong with the message, e.g. the
         signature is invalid, the proof of work hash is invalid or not large
-        enough, the header has an invalid format or the message is too small
+        enough, the header has an invalid format, the message is too small
+        or when the claimed proximity doesn't match the calculated proximity
     """
 
     min_proximity = min_proximity or 0
@@ -132,6 +169,8 @@ def unpack_message(msg: bytes, min_proximity: int = None, proof_of_work_bits: in
         pss.new(pub_key).verify(SHA512.new(msg[2:-SIGNATURE_LENGTH]), signature)
     except IndexError as exc:
         raise ValueError from exc
+    if calculate_proximity(pub_key, round_time) != proximity:
+        raise ValueError(f"Calculated proximity doesn't match proximity {proximity}")
 
     return ProtocolMessage(public_key=pub_key, proximity=proximity, round_time=round_time)
 
