@@ -12,21 +12,20 @@ from Crypto.Hash import SHA512
 
 
 # Protocol structure:
-# 1 byte    | header code (static `0x42`)
-# 1 byte    | hop count (updated at each relaying peer)
-# 2 bytes   | length of the RSA public key in bytes (see below)
-# 4 bytes   | proximity in bits
-# 8 bytes   | time of the round
-# 8 bytes   | random sample data for the proof of work
-# var bytes | RSA public key in DEM binary format
-# 512 bytes | 4096-bit RSA signature of everything except the first 2 bytes
-PROTOCOL_HEADER = struct.Struct("!cBHLQQ")
-HASHED_HEADER = struct.Struct("!HLQQ")
-HEADER_CODE = b"*"
-HEADER_LENGTH = 24
+# 2 bytes    | hop count (updated at each relaying peer)
+# 1 byte     | currently reserved for future use (currently ignored)
+# 1 byte     | claimed proximity in bits
+# 2 bytes    | length of the RSA public key in bytes (see below)
+# 8 bytes    | time of the round
+# 8 bytes    | random sample data for the proof of work
+# var bytes  | RSA public key in DEM binary format
+# 512 bytes  | 4096-bit RSA signature of everything except the first 2 bytes
+PROTOCOL_HEADER = struct.Struct("!HxBHQQ")
+HASHED_HEADER = struct.Struct("!xBHQQ")
+HEADER_LENGTH = 22
 SIGNATURE_LENGTH = 512
 
-DEFAULT_HOP_COUNT = 64
+DEFAULT_HOP_COUNT = 0
 DEFAULT_PROOF_OF_WORK_BITS = 20  # TODO: Check which number of PoW bits is sufficient for the network
 HASH_ENDIAN = "big"
 
@@ -39,6 +38,7 @@ class ProtocolMessage:
 
     round_time: int
     proximity: int
+    hop_count: int
     public_key: RSA.RsaKey
 
 
@@ -67,11 +67,10 @@ def calculate_proximity(rsa_key: RSA.RsaKey, value: Union[int, bytes]) -> int:
         value = bytes(ba)
     elif not isinstance(value, bytes):
         raise TypeError(f"Expected bytes or int, not {type(value)}")
-    h_ = int.from_bytes(hashlib.sha256(value).digest(), HASH_ENDIAN)
 
     # Using binary representations and string operations is hacky but easy
     n = bin(rsa_key.public_key().n)[2:]
-    h = bin(h_)[2:]
+    h = bin(int.from_bytes(hashlib.sha256(value).digest(), HASH_ENDIAN))[2:]
     while len(h) < 256:
         h = "0" + h
     c = 0
@@ -101,7 +100,7 @@ def build_message(
         it will be generated on demand of not explicitly given
     :param proof_of_work_bits: optional override of the required
         trailing zero bits of the SHA256 hash of the unsigned payload
-    :param hop_count: optional override of the target hop count
+    :param hop_count: optional override of the default hop count
     :return: assembled bytes string containing a valid NSE protocol message
     :raises ValueError: for invalid RSA key input or when packing of structs failed
     """
@@ -122,7 +121,7 @@ def build_message(
     hashed_header = None
     try:
         for sample in range(1 << 64):
-            hashed_header = HASHED_HEADER.pack(key_length, proximity, round_time, sample) + exported_public_key
+            hashed_header = HASHED_HEADER.pack(proximity, key_length, round_time, sample) + exported_public_key
             if _check_proof_of_work(proof_of_work_bits, hashed_header):
                 break
     except struct.error as exc:
@@ -136,7 +135,7 @@ def build_message(
         logger.debug(f"Calculating message with {proof_of_work_bits}-bit hash collision took {end - start:.3f} seconds")
     sig = pss.new(rsa_key).sign(SHA512.new(hashed_header))
     try:
-        header = PROTOCOL_HEADER.pack(HEADER_CODE, hop_count, key_length, proximity, round_time, sample)
+        header = PROTOCOL_HEADER.pack(hop_count, proximity, key_length, round_time, sample)
     except struct.error as exc:
         raise ValueError("Error packing the protocol header") from exc
     return header + exported_public_key + sig
@@ -166,13 +165,9 @@ def unpack_message(msg: bytes, min_proximity: int = None, proof_of_work_bits: in
         raise ValueError("Message is too small, it can't hold all relevant data.")
 
     try:
-        header_code, hop_count, pub_key_len, proximity, round_time, sample = PROTOCOL_HEADER.unpack(msg[:24])
+        hop_count, proximity, pub_key_len, round_time, sample = PROTOCOL_HEADER.unpack(msg[:HEADER_LENGTH])
     except struct.error as exc:
         raise ValueError("Invalid header format can't be unpacked") from exc
-    if header_code != HEADER_CODE:
-        raise ValueError(f"Invalid header code {msg[0]}, expected {HEADER_CODE}")
-    if hop_count == 0:
-        raise ValueError("Invalid hop count 0")
     if len(msg) != HEADER_LENGTH + pub_key_len + SIGNATURE_LENGTH:
         raise ValueError(f"Invalid public key length {pub_key_len} found in header")
     if min_proximity > proximity:
@@ -180,7 +175,7 @@ def unpack_message(msg: bytes, min_proximity: int = None, proof_of_work_bits: in
 
     if not _check_proof_of_work(
             proof_of_work_bits,
-            HASHED_HEADER.pack(pub_key_len, proximity, round_time, sample)
+            HASHED_HEADER.pack(proximity, pub_key_len, round_time, sample)
             + msg[HEADER_LENGTH:HEADER_LENGTH + pub_key_len]
     ):
         raise ValueError("Invalid ProofOfWork hash")
@@ -193,7 +188,7 @@ def unpack_message(msg: bytes, min_proximity: int = None, proof_of_work_bits: in
     if calculate_proximity(pub_key, round_time) != proximity:
         raise ValueError(f"Calculated proximity doesn't match proximity {proximity}")
 
-    return ProtocolMessage(public_key=pub_key, proximity=proximity, round_time=round_time)
+    return ProtocolMessage(public_key=pub_key, proximity=proximity, hop_count=hop_count, round_time=round_time)
 
 
 if __name__ == "__main__":
