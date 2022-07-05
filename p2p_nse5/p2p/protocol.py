@@ -33,6 +33,10 @@ HASH_ENDIAN = "big"
 
 @dataclasses.dataclass
 class ProtocolMessage:
+    """
+    Simple dataclass carrying the values of a valid incoming NSE protocol message
+    """
+
     round_time: int
     proximity: int
     public_key: RSA.RsaKey
