@@ -80,18 +80,35 @@ def calculate_proximity(rsa_key: RSA.RsaKey, value: Union[int, bytes]) -> int:
 
 def build_message(
         rsa_key: RSA.RsaKey,
-        proximity: int,
         round_time: int,
         logger: logging.Logger = None,
+        proximity: int = None,
         proof_of_work_bits: int = None,
         hop_count: int = None
 ) -> bytes:
+    """
+    Construct a binary NSE protocol message from a set of input values
+
+    :param rsa_key: private and public key pair of a 4096 bit RSA key
+    :param round_time: round time which is spread across the network
+    :param logger: optional logger to keep track of the PoW calculation time
+    :param proximity: optional number of equal leading bits between the
+        hash of the round time (target identity) and the key identity;
+        it will be generated on demand of not explicitly given
+    :param proof_of_work_bits: optional override of the required
+        trailing zero bits of the SHA256 hash of the unsigned payload
+    :param hop_count: optional override of the target hop count
+    :return: assembled bytes string containing a valid NSE protocol message
+    :raises ValueError: for invalid RSA key input or when packing of structs failed
+    """
+
     hop_count = hop_count or DEFAULT_HOP_COUNT
     proof_of_work_bits = proof_of_work_bits or DEFAULT_PROOF_OF_WORK_BITS
     if not rsa_key.has_private():
         raise ValueError(f"RSA key {rsa_key} doesn't contain a private part!")
     if rsa_key.size_in_bits() != 4096:
         raise ValueError(f"Only RSA keys of size 4096 bits are supported")
+    proximity = proximity or calculate_proximity(rsa_key.public_key(), round_time)
     exported_public_key = rsa_key.public_key().export_key(format="DER")
     key_length = len(exported_public_key)
 
@@ -180,8 +197,7 @@ if __name__ == "__main__":
 
     key = RSA.generate(4096)
     print("Generated 4096 bit RSA key.")
-    p = random.randint(0, 64)
     t = random.randint(0, 65536) * random.randint(0, 65536) * random.randint(0, 65536)
-    m = build_message(key, p, t)
-    print(f"Message for proximity={p} and round time={t} (len={len(m)}):\n{m}")
+    m = build_message(key, t)
+    print(f"Message for round time={t} (len={len(m)}):\n{m}")
     print(f"Unpacked message: {unpack_message(m)}")
