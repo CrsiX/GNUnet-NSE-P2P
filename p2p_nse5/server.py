@@ -1,7 +1,10 @@
 import asyncio
 import struct
-import msg_types
 from types import coroutine
+
+from .protocols import api
+from .protocols.msg_types import MessageType
+
 
 class APIServer:
     def __init__(self, port):
@@ -12,7 +15,7 @@ class APIServer:
     def validate_request(self, data):
         try:
             data = struct.unpack('!2H', data)
-            return data[0] == 4 and data[1] == msg_types.NSE_QUERY
+            return data[0] == 4 and data[1] == MessageType.NSE_QUERY
         except:
             return False
 
@@ -20,13 +23,13 @@ class APIServer:
     def validate_answer(self, data):
         try:
             data = struct.unpack('!2H2I', data)
-            return data[0] == 12 and data[1] == msg_types.NSE_ESTIMATE
+            return data[0] == 12 and data[1] == MessageType.NSE_ESTIMATE
         except:
             return False
 
     # Assembles answer in a struct wtih length 16, correct message type, and the estimates from the parameter
     def assemble_answer(peers, std_deviation):
-        return struct.pack('!2H2I', 16, msg_types.NSE_ESTIMATE, int(peers), int(std_deviation))
+        return struct.pack('!2H2I', 16, MessageType.NSE_ESTIMATE, int(peers), int(std_deviation))
 
     # Handles a query request call
     async def handle_request(self, reader, writer):
