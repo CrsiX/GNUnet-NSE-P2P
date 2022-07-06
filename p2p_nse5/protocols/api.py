@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Any
 
 
 @dataclasses.dataclass
@@ -30,4 +31,18 @@ def unpack_nse_query(msg: bytes) -> bool:
 
 
 def pack_nse_estimate(peers: int, std_deviation: int) -> bytes:
+    pass  # TODO
+
+
+def unpack_incoming_message(msg: bytes) -> (int, Any):
+    """
+    Parse, validate and unpack an incoming API message into type and data
+
+    :param msg: incoming unchecked message in raw bytes
+    :return: tuple of the message type identifier and the
+        unpacked value specific to the specific message type
+    :raises ValueError: when an unsupported message type was
+        detected or when the message is malformed in any way
+    """
+
     pass  # TODO
