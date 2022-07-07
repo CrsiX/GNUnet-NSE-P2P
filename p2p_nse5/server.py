@@ -1,6 +1,5 @@
 import asyncio
 import struct
-from types import coroutine
 
 from .protocols import api
 from .protocols.msg_types import MessageType
@@ -16,7 +15,7 @@ class APIServer:
         try:
             data = struct.unpack('!2H', data)
             return data[0] == 4 and data[1] == MessageType.NSE_QUERY
-        except:
+        except Exception:
             return False
 
     # Check if answer has the right length and message-type as specified
@@ -24,7 +23,7 @@ class APIServer:
         try:
             data = struct.unpack('!2H2I', data)
             return data[0] == 12 and data[1] == MessageType.NSE_ESTIMATE
-        except:
+        except Exception:
             return False
 
     # Assembles answer in a struct wtih length 16, correct message type, and the estimates from the parameter
@@ -53,13 +52,13 @@ class APIServer:
         async with self.server:
             await self.server.serve_forever()
 
-
     # Stops API Server
     def stop_api_server(self, event_loop):
-        if self.server != None:
+        if self.server is not None:
             self.server.close()
             event_loop.run_until_complete(self.server.wait_closed())
             self.server = None
+
 
 if __name__ == "__main__":
     server = APIServer(1337)
