@@ -1,7 +1,7 @@
 import asyncio
 import struct
 
-from .protocols import api
+# from .protocols import api  # TODO: Use the methods provided by that module
 from .protocols.msg_types import MessageType
 
 

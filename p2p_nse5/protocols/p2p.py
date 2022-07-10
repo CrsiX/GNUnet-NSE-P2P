@@ -110,7 +110,7 @@ def build_message(
     if not rsa_key.has_private():
         raise ValueError(f"RSA key {rsa_key} doesn't contain a private part!")
     if rsa_key.size_in_bits() != 4096:
-        raise ValueError(f"Only RSA keys of size 4096 bits are supported")
+        raise ValueError("Only RSA keys of size 4096 bits are supported")
     proximity = proximity or calculate_proximity(rsa_key.public_key(), round_time)
     exported_public_key = rsa_key.public_key().export_key(format="DER")
     key_length = len(exported_public_key)
