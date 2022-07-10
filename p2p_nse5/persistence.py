@@ -5,11 +5,12 @@ Database models and functions using SQLAlchemy
 import random
 import string
 import logging
+import datetime
 from typing import Optional
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, DateTime, ForeignKey, func, Integer, LargeBinary
 from sqlalchemy.engine import Engine as _Engine
-from sqlalchemy.orm import declarative_base, sessionmaker, Session
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker, Session
 
 
 DEFAULT_DATABASE_URL: str = f"sqlite:///tmp/nse_{''.join(random.choice(string.ascii_lowercase) for _ in '_' * 16)}.db"
@@ -18,6 +19,50 @@ Base = declarative_base()
 _engine: Optional[_Engine] = None
 _make_session: Optional[sessionmaker] = None
 _logger: logging.Logger = logging.getLogger(__name__)
+
+
+class Peer(Base):
+    """
+    Model of a peer in the network identified by the unique public key
+    """
+
+    __tablename__ = "peers"
+
+    id: int = Column(Integer, nullable=False, primary_key=True, autoincrement=True, unique=True)
+    public_key: bytes = Column(LargeBinary, nullable=False, unique=True)
+    """RSA 4096 public key of the remote peer in DEM binary format"""
+    interactions: int = Column(Integer, nullable=False, default=1)
+    """Counter how often our NSE module contacted the peer's NSE module or vice versa"""
+    created: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now())
+    updated: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
+
+    def __repr__(self) -> str:
+        return f"Peer(id={self.id}, interactions={self.interactions})"
+
+
+class Round(Base):
+    """
+    Model of a time round and related information like the best peer or the max hops
+    """
+
+    __tablename__ = "rounds"
+
+    id: int = Column(Integer, nullable=False, primary_key=True, autoincrement=True, unique=True)
+    round: int = Column(Integer, nullable=False, unique=True)
+    """Round identifier"""
+    proximity: int = Column(Integer, nullable=False)
+    """Verified proximity measured in matching leading bits of the best peer (see `peer`)"""
+    max_hops: int = Column(Integer, nullable=False, default=1)
+    """Highest number of relaying hops in the round, not necessarily related to the best peer"""
+    peer_id: int = Column(Integer, ForeignKey("peers.id"), nullable=False)
+    """ID of the peer who sent the time sample to us"""
+    peer: Peer = relationship("Peer", backref="rounds")
+    """Relation to the peers, so that the `rounds` of a peer necessarily are the best rounds"""
+    created: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now())
+    updated: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
+
+    def __repr__(self) -> str:
+        return f"Round(id={self.id}, round={self.round}, proximity={self.proximity})"
 
 
 def init(database_url: str, create_all: bool = True):
