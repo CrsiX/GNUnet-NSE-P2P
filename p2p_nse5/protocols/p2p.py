@@ -25,8 +25,8 @@ HASHED_HEADER = struct.Struct("!xBHQQ")
 HEADER_LENGTH = 22
 SIGNATURE_LENGTH = 512
 
-DEFAULT_HOP_COUNT = 0
-DEFAULT_PROOF_OF_WORK_BITS = 20  # TODO: Check which number of PoW bits is sufficient for the network
+# This is a sane fallback value, but the real "default" is set in the configuration module
+DEFAULT_PROOF_OF_WORK_BITS = 20
 HASH_ENDIAN = "big"
 
 
@@ -105,7 +105,7 @@ def build_message(
     :raises ValueError: for invalid RSA key input or when packing of structs failed
     """
 
-    hop_count = hop_count or DEFAULT_HOP_COUNT
+    hop_count = hop_count or 0
     proof_of_work_bits = proof_of_work_bits or DEFAULT_PROOF_OF_WORK_BITS
     if not rsa_key.has_private():
         raise ValueError(f"RSA key {rsa_key} doesn't contain a private part!")

@@ -21,10 +21,15 @@ class NSEConfiguration(pydantic.BaseModel):
     pass
 
 
+class NSEDefaultConfiguration(pydantic.BaseModel):
+    proof_of_work_bits: int = 20
+
+
 class Configuration(pydantic.BaseModel):
     host_key_file: str
     gossip: GossipConfiguration
     nse: NSEConfiguration
+    nse_override: NSEDefaultConfiguration = NSEDefaultConfiguration()
 
 
 def load_configuration(filenames: list[str]) -> Configuration:
