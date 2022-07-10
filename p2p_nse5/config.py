@@ -7,6 +7,9 @@ import configparser
 
 import pydantic
 
+from . import utils
+
+
 DEFAULT_SECTION = "_default"
 GLOBAL_SECTION = "global"
 DEFAULT_CONFIG_FILE = "config.ini"
@@ -14,11 +17,19 @@ DEFAULT_CONFIG_INI_PATH = os.path.join("static", "default_configuration.ini")
 
 
 class GossipConfiguration(pydantic.BaseModel):
-    pass
+    api_address: str
+
+    @pydantic.validator("api_address")
+    def is_valid_address_and_port(value: str):  # noqa
+        return utils.validate_ip_address_and_port(value)
 
 
 class NSEConfiguration(pydantic.BaseModel):
-    pass
+    api_address: str
+
+    @pydantic.validator("api_address")
+    def is_valid_address_and_port(value: str):  # noqa
+        return utils.validate_ip_address_and_port(value)
 
 
 class NSEDefaultConfiguration(pydantic.BaseModel):
