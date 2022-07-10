@@ -20,19 +20,20 @@ class GossipNotification:
 
 
 def pack_gossip_announce(data_type: int, data: bytes, ttl: int) -> bytes:
-    pass
+    header = struct.Struct("!HHBxH").pack(8 + len(data), MessageType.GOSSIP_ANNOUNCE, ttl, data_type)
+    return header + data
 
 
 def pack_gossip_notify(data_type: int) -> bytes:
-    pass  # TODO
+    return struct.Struct("!HHHH").pack(8, MessageType.GOSSIP_NOTIFY, 0, data_type)
 
 
 def pack_gossip_validation(message_id: int, valid: bool) -> bytes:
-    pass  # TODO
+    return struct.Struct("!HHHH").pack(8, MessageType.GOSSIP_VALIDATION, message_id, int(valid))
 
 
 def pack_nse_estimate(peers: int, std_deviation: int) -> bytes:
-    pass  # TODO
+    return struct.Struct("!HHII").pack(12, MessageType.NSE_ESTIMATE, peers, std_deviation)
 
 
 def unpack_incoming_message(msg: bytes) -> (int, Union[bool, GossipNotification]):
