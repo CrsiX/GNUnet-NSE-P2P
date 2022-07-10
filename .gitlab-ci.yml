@@ -61,6 +61,8 @@ unittest-3.10-alpine:
   stage: test
   image: python:3.10-alpine
   script:
+    - apk update
+    - apk add gcc
     - pip install -r requirements.txt
     - python -m tests -v
 
@@ -75,6 +77,8 @@ unittest-3.9-alpine:
   stage: test
   image: python:3.9-alpine
   script:
+    - apk update
+    - apk add gcc
     - pip install -r requirements.txt
     - python -m tests -v
 
