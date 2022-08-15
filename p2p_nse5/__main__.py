@@ -6,7 +6,7 @@ import shutil
 import asyncio
 import logging.config
 
-from . import config, nse, utils, server
+from . import config, utils, server
 
 
 def main() -> int:

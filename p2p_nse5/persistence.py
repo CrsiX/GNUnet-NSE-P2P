@@ -13,12 +13,12 @@ from sqlalchemy.engine import Engine as _Engine
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker, Session
 
 
-DEFAULT_DATABASE_URL: str = f"sqlite:///tmp/nse_{''.join(random.choice(string.ascii_lowercase) for _ in '_' * 16)}.db"
+DEFAULT_DATABASE_URL: str = f"sqlite:////tmp/nse_{''.join(random.choice(string.ascii_lowercase) for _ in '_' * 16)}.db"
 
 Base = declarative_base()
 _engine: Optional[_Engine] = None
 _make_session: Optional[sessionmaker] = None
-_logger: logging.Logger = logging.getLogger(__name__)
+_logger: logging.Logger = logging.getLogger("persistence")
 
 
 class Peer(Base):
