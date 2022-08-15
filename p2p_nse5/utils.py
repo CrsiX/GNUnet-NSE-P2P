@@ -2,11 +2,20 @@
 Module with various different utilities
 """
 
+import socket
 import argparse
+from typing import Tuple
 
 import pydantic
 
 from . import config
+
+
+def counter(start: int = 0):
+    n = start
+    while True:
+        n += 1
+        yield n
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
@@ -30,25 +39,31 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def validate_ip_address_and_port(value: str) -> str:
+def split_ip_address_and_port(value: str) -> Tuple[socket.AddressFamily, str, int]:
     """
     Validate that a given string conforms to the specific IP and port layout
+    and split it into address family, IP address string and port number
 
     This layout uses `{ipv4}:{port}` or `[{ipv6}]:{port}`.
 
     :param value: string to check for layout validity
-    :return: the same, un-changed string
+    :return: a tuple of the address family (either IPv4 or IPv6),
+        the IP address as a string and the port number as integer
     :raises ValueError: when the string is not conform to the layout
     """
 
     if ":" not in value:
         raise ValueError("Missing ':'")
-    if not 0 < int(value[value.rfind(":")+1:]) < 65536:
+    port = int(value[value.rfind(":") + 1:])
+    if not 0 < port < 65536:
         raise ValueError("Invalid port")
     if value.startswith("[") and "]:" in value:
-        if pydantic.IPvAnyAddress().validate(value[1:value.rfind("]")]).version != 6:
+        ip = value[1:value.rfind("]")]
+        if pydantic.IPvAnyAddress().validate(ip).version != 6:
             raise ValueError("Invalid IPv6 address")
+        return socket.AF_INET6, ip, port
     else:
-        if pydantic.IPvAnyAddress().validate(value[:value.rfind(":")]).version != 4:
+        ip = value[:value.rfind(":")]
+        if pydantic.IPvAnyAddress().validate(ip).version != 4:
             raise ValueError("Invalid IPv4 address")
-    return value
+        return socket.AF_INET, ip, port
