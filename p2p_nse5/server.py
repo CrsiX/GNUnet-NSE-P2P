@@ -1,31 +1,24 @@
 import asyncio
-import struct
+import logging
+from typing import Optional
 
-# from .protocols import api  # TODO: Use the methods provided by that module
-from .protocols.msg_types import MessageType
+from . import config, utils
+
+
+class APIProtocol(asyncio.Protocol):
+    pass
 
 
 class APIServer:
-    def __init__(self, port):
-        self.server = None
-        self.port = port
+    def __init__(self, conf: config.Configuration):
+        self._conf = conf
+        self._logger = logging.getLogger("nse.server")
+        self._server: Optional[asyncio.AbstractServer] = None
 
-    # Starts the API Server and runs the event loop
-    async def start_api_server(self):
+    async def run(self):
         event_loop = asyncio.get_running_loop()
-        self.server = await event_loop.create_server(self.handle_request, "127.0.0.1", self.port)
-        print("Server started")
-        async with self.server:
-            await self.server.serve_forever()
-
-    # Stops API Server
-    def stop_api_server(self, event_loop):
-        if self.server is not None:
-            self.server.close()
-            event_loop.run_until_complete(self.server.wait_closed())
-            self.server = None
-
-
-if __name__ == "__main__":
-    server = APIServer(1337)
-    asyncio.run(server.start_api_server())
+        family, host, port = utils.split_ip_address_and_port(self._conf.nse.api_address)
+        self._server = await event_loop.create_server(lambda: APIProtocol(), host, port, family=family)
+        self._logger.info("API server started on host %s and port %d", host, port)
+        async with self._server:
+            await self._server.serve_forever()
