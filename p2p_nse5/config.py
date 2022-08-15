@@ -21,7 +21,7 @@ class GossipConfiguration(pydantic.BaseModel):
 
     @pydantic.validator("api_address")
     def is_valid_address_and_port(value: str):  # noqa
-        utils.split_ip_address_and_port(value)
+        utils.split_ip_address_and_port(value, True)
         return value
 
 
@@ -30,7 +30,7 @@ class NSEConfiguration(pydantic.BaseModel):
 
     @pydantic.validator("api_address")
     def is_valid_address_and_port(value: str):  # noqa
-        utils.split_ip_address_and_port(value)
+        utils.split_ip_address_and_port(value, True)
         return value
 
 

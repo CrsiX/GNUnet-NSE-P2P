@@ -2,11 +2,10 @@ import asyncio
 import logging
 from typing import Optional
 
-from . import config, utils
+from . import config, handler, utils
 
 
-class APIProtocol(asyncio.Protocol):
-    pass
+# TODO: Open an API connection to gossip & keep it open until exit
 
 
 class APIServer:
@@ -18,7 +17,9 @@ class APIServer:
     async def run(self):
         event_loop = asyncio.get_running_loop()
         family, host, port = utils.split_ip_address_and_port(self._conf.nse.api_address)
-        self._server = await event_loop.create_server(lambda: APIProtocol(), host, port, family=family)
+        self._server = await event_loop.create_server(
+            lambda: handler.APIProtocol(self._conf), host, port, family=family
+        )
         self._logger.info("API server started on host %s and port %d", host, port)
         async with self._server:
             await self._server.serve_forever()

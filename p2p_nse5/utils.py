@@ -4,6 +4,7 @@ Module with various different utilities
 
 import socket
 import argparse
+import ipaddress
 from typing import Tuple
 
 import pydantic
@@ -39,7 +40,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def split_ip_address_and_port(value: str) -> Tuple[socket.AddressFamily, str, int]:
+def split_ip_address_and_port(value: str, require_localhost: bool = False) -> Tuple[socket.AddressFamily, str, int]:
     """
     Validate that a given string conforms to the specific IP and port layout
     and split it into address family, IP address string and port number
@@ -47,6 +48,7 @@ def split_ip_address_and_port(value: str) -> Tuple[socket.AddressFamily, str, in
     This layout uses `{ipv4}:{port}` or `[{ipv6}]:{port}`.
 
     :param value: string to check for layout validity
+    :param require_localhost: switch to enforce a IPv4 or IPv6 localhost address
     :return: a tuple of the address family (either IPv4 or IPv6),
         the IP address as a string and the port number as integer
     :raises ValueError: when the string is not conform to the layout
@@ -61,9 +63,13 @@ def split_ip_address_and_port(value: str) -> Tuple[socket.AddressFamily, str, in
         ip = value[1:value.rfind("]")]
         if pydantic.IPvAnyAddress().validate(ip).version != 6:
             raise ValueError("Invalid IPv6 address")
+        if require_localhost and not ipaddress.IPv6Address(ip).is_loopback:
+            raise ValueError(f"IPv6 {ip} is no address of localhost")
         return socket.AF_INET6, ip, port
     else:
         ip = value[:value.rfind(":")]
         if pydantic.IPvAnyAddress().validate(ip).version != 4:
             raise ValueError("Invalid IPv4 address")
+        if require_localhost and not ipaddress.IPv4Address(ip).is_loopback:
+            raise ValueError(f"IPv4 {ip} is no address of localhost")
         return socket.AF_INET, ip, port

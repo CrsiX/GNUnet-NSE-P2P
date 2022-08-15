@@ -1,6 +1,6 @@
 import dataclasses
 import struct
-from typing import Union
+from typing import Tuple, Union
 
 from .msg_types import MessageType
 
@@ -36,7 +36,7 @@ def pack_nse_estimate(peers: int, std_deviation: int) -> bytes:
     return struct.Struct("!HHII").pack(12, MessageType.NSE_ESTIMATE, peers, std_deviation)
 
 
-def unpack_incoming_message(msg: bytes) -> (int, Union[bool, GossipNotification]):
+def unpack_incoming_message(msg: bytes) -> Tuple[int, Union[bool, GossipNotification]]:
     """
     Parse, validate and unpack an incoming API message into type and data
 

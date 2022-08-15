@@ -3,8 +3,10 @@
 import os
 import sys
 import shutil
+import asyncio
+import logging.config
 
-from . import config, utils
+from . import config, nse, utils, server
 
 
 def main() -> int:
@@ -17,10 +19,24 @@ def main() -> int:
             return 2
 
         try:
-            _ = config.load_configuration([args.config])  # TODO: Use the loaded configuration in the rest of the app
+            conf = config.load_configuration([args.config])
         except Exception:
             parser.print_usage(sys.stderr)
             raise
+
+        # TODO: Move the logging configuration to the config file (or at least the main parts of it)
+        logging.basicConfig(
+            # filename="nse5.log",
+            datefmt="%d.%m.%Y %H:%M:%S",
+            format="{asctime}: [{levelname:<8}] {name}: {message}",
+            style="{",
+            level=logging.DEBUG
+        )
+
+        try:
+            asyncio.run(server.APIServer(conf).run())
+        except KeyboardInterrupt:
+            logging.getLogger("nse").info("Exiting")
 
     elif args.command == "config":
         if not args.force and os.path.exists(args.config):
