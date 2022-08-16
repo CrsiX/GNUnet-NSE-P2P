@@ -5,8 +5,10 @@ P2P NSE5 unittest framework
 import unittest
 from typing import Optional
 
+from . import cli
 
-TEST_CLASSES = []
+
+TEST_CLASSES = [cli.CLITests]
 
 
 class MainProgram(unittest.TestProgram):

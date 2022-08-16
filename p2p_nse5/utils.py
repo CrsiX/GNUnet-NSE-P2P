@@ -22,7 +22,7 @@ def counter(start: int = 0):
 def get_cli_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="p2p_nse5",
-        description=__doc__,
+        description="API for handling Network Size Estimation (NSE) based on GNUnet NSE algorithm for P2P applications",
         epilog="Licensed under AGPLv3."
     )
     parser.add_argument(
