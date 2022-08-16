@@ -30,7 +30,11 @@ class NSEConfiguration(pydantic.BaseModel):
     api_address: str
     api_data_type: int = random.randint(1, 65535)
 
-    logfile: str = "-"
+    log_file: str = "-"  # also supports stdout and stderr
+    log_level: str = "DEBUG"
+    log_style: str = "{"
+    log_format: str = "{asctime}: [{levelname:<8}] {name}: {message}"
+    log_dateformat: str = "%d.%m.%Y %H:%M:%S"
     proof_of_work_bits: int = 20
 
     @pydantic.validator("api_address")

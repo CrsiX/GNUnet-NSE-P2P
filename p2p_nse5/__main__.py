@@ -24,14 +24,19 @@ def main() -> int:
             parser.print_usage(sys.stderr)
             raise
 
-        # TODO: Move the logging configuration to the config file (or at least the main parts of it)
-        logging.basicConfig(
-            # filename="nse5.log",
-            datefmt="%d.%m.%Y %H:%M:%S",
-            format="{asctime}: [{levelname:<8}] {name}: {message}",
-            style="{",
-            level=logging.DEBUG
-        )
+        log_conf = {
+            "datefmt": conf.nse.log_dateformat,
+            "format": conf.nse.log_format,
+            "level": conf.nse.log_level,
+            "style": conf.nse.log_style
+        }
+        if conf.nse.log_file not in ["", "-", "stdout", "stderr"]:
+            log_conf["filename"] = conf.nse.log_file
+        elif conf.nse.log_file == "stderr":
+            log_conf["stream"] = sys.stderr
+        elif conf.nse.log_file == "stdout":
+            log_conf["stream"] = sys.stdout
+        logging.basicConfig(**log_conf)
 
         try:
             asyncio.run(nse.Server(conf).run())
