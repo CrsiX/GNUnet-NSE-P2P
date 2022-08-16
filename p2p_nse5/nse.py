@@ -1,57 +1,72 @@
+import socket
 import asyncio
 import logging
-from typing import Optional
+import ipaddress
+from typing import ClassVar, Optional
 
-# Note one additional import during the 'Server._start_gossip_client' method
-from . import config, handler, utils
+import sqlalchemy.orm
+
+from . import config, persistence, utils
+from .protocols import api
 
 
-class Server:
-    def __init__(self, conf: config.Configuration):
-        self._conf = conf
-        self._logger = logging.getLogger("nse.server")
-        self._server: Optional[asyncio.AbstractServer] = None
-        self._gossip_fails: int = 0
-        self.gossip_protocol: Optional[asyncio.Protocol] = None
-        self.gossip_transport: Optional[asyncio.Transport] = None
+class Protocol(asyncio.Protocol):
+    _instance_counter: ClassVar = utils.counter()
 
-    async def _start_gossip_client(self, loop: asyncio.AbstractEventLoop, first: bool = False) -> bool:
-        from . import gossip
-        family, host, port = utils.split_ip_address_and_port(self._conf.gossip.api_address)
+    def __init__(self, configuration: config.Configuration):
+        self._ident: int = next(type(self)._instance_counter)
+        self.logger: logging.Logger = logging.getLogger(f"nse.handler.{self._ident}")
+        self.config: config.Configuration = configuration
+        self.transport: Optional[asyncio.Transport] = None
+        self.family: socket.AddressFamily
+        self.family, _, _ = utils.split_ip_address_and_port(self.config.nse.api_address)
+        self.session: Optional[sqlalchemy.orm.Session] = None
+
+    def connection_made(self, transport: asyncio.Transport) -> None:
+        self.transport = transport
+        if self.family == socket.AF_INET:
+            host, port = transport.get_extra_info("peername", [None, None])
+            ip = ipaddress.IPv4Address(host)
+        elif self.family == socket.AF_INET6:
+            host, port, _, _ = transport.get_extra_info("peername", [None, None, None, None])
+            ip = ipaddress.IPv6Address(host)
+        else:
+            raise RuntimeError("Unsupported address family")
+
+        if not ip.is_loopback:
+            self.logger.warning("Blocked incoming connection from %s port %d (not localhost!)", host, port)
+            self.transport.write_eof()
+            self.transport.close()
+            return
+        self.logger.info("Accepted incoming connection from %s port %d", host, port)
+
+    def data_received(self, data: bytes) -> None:
         try:
-            self.gossip_transport, self.gossip_protocol = await loop.create_connection(
-                lambda: gossip.Client(self._conf.nse.api_data_type, self), host, port, family=family
-            )
+            msg_type, value = api.unpack_incoming_message(data)
+            self.logger.info(f"Incoming API message: {msg_type=!r} {value=!r}")
+        except api.InvalidMessage as exc:
+            self.logger.warning(f"Invalid API message: {exc}")
+            if len(data) < 80:
+                self.logger.debug("Full data: %s", data)
+            else:
+                self.logger.debug(f"Full data is {len(data)} bytes long. Skipped as too big API message.")
 
-        except Exception as exc:
-            if first:
-                if self.gossip_transport is None:
-                    self._logger.critical("Failed to create a connection to gossip on %s port %d: %s", host, port, exc)
-                raise
-            self._logger.warning("Failed to connect to gossip: %s", exc)
-            delay = 1.5 ** self._gossip_fails
-            self._gossip_fails += 1
-            self._logger.debug("Sleeping for %.2f seconds before the next re-connect attempt ...", delay)
-            await asyncio.sleep(delay)
-            loop.create_task(self._start_gossip_client(loop))
-            return False
+        # TODO: Do message handling and write an answer using `self.transport.write(bytes)`
 
-        if self._gossip_fails > 0:
-            self._logger.info("Successfully established a gossip connection after %d attempts", self._gossip_fails)
-            self._gossip_fails = 0
-        return True
+        if self.transport.can_write_eof():
+            self.transport.write_eof()
+        self.transport.close()
 
-    def reconnect_client(self):
-        loop = asyncio.get_event_loop()
-        loop.create_task(self._start_gossip_client(loop))
+    def eof_received(self) -> Optional[bool]:
+        self.logger.debug("Received EOF on transport (closing connection)")
+        if not self.transport.is_closing():
+            self.transport.close()
+        return False
 
-    async def run(self):
-        event_loop = asyncio.get_running_loop()
-        await self._start_gossip_client(event_loop, True)
-        family, host, port = utils.split_ip_address_and_port(self._conf.nse.api_address)
-        self._server = await event_loop.create_server(
-            lambda: handler.APIProtocol(self._conf), host, port, family=family
-        )
-        self._logger.info("API server started on host %s and port %d", host, port)
-        async with self._server:
-            await self._server.serve_forever()
+    def connection_lost(self, exc: Optional[Exception]) -> None:
+        if exc is None:
+            self.logger.debug("Lost connection to remote end")
+        else:
+            self.logger.debug("Lost connection to remote side (reason: %s)", str(exc), exc_info=exc)
+        if not self.transport.is_closing():
+            self.transport.close()

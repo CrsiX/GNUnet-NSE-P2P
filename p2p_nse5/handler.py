@@ -9,7 +9,7 @@ import sqlalchemy.orm
 
 from .protocols.msg_types import MessageType
 # from .protocols import api  # TODO: Use the methods provided by that module
-from . import config, utils
+from . import config, persistence, utils
 from .protocols import api
 
 
@@ -46,67 +46,3 @@ class MessageHandler:
 
     def assemble_answer(self, peers, std_deviation):
         return struct.pack('!2H2I', 16, MessageType.NSE_ESTIMATE, int(peers), int(std_deviation))
-
-
-
-
-class APIProtocol(asyncio.Protocol):
-    _instance_counter: ClassVar = utils.counter()
-
-    def __init__(self, configuration: config.Configuration):
-        self._ident: int = next(type(self)._instance_counter)
-        self.logger: logging.Logger = logging.getLogger(f"nse.handler.{self._ident}")
-        self.config: config.Configuration = configuration
-        self.transport: Optional[asyncio.Transport] = None
-        self.family: socket.AddressFamily
-        self.family, _, _ = utils.split_ip_address_and_port(self.config.nse.api_address)
-        self.session: Optional[sqlalchemy.orm.Session] = None
-
-    def connection_made(self, transport: asyncio.Transport) -> None:
-        self.transport = transport
-        if self.family == socket.AF_INET:
-            host, port = transport.get_extra_info("peername", [None, None])
-            ip = ipaddress.IPv4Address(host)
-        elif self.family == socket.AF_INET6:
-            host, port, _, _ = transport.get_extra_info("peername", [None, None, None, None])
-            ip = ipaddress.IPv6Address(host)
-        else:
-            raise RuntimeError("Unsupported address family")
-
-        if not ip.is_loopback:
-            self.logger.warning("Blocked incoming connection from %s port %d (not localhost!)", host, port)
-            self.transport.write_eof()
-            self.transport.close()
-            return
-        self.logger.info("Accepted incoming connection from %s port %d", host, port)
-
-    def data_received(self, data: bytes) -> None:
-        try:
-            msg_type, value = api.unpack_incoming_message(data)
-            self.logger.info(f"Incoming API message: {msg_type=!r} {value=!r}")
-        except api.InvalidMessage as exc:
-            self.logger.warning(f"Invalid API message: {exc}")
-            if len(data) < 80:
-                self.logger.debug("Full data: %s", data)
-            else:
-                self.logger.debug(f"Full data is {len(data)} bytes long. Skipped as too big API message.")
-
-        # TODO: Do message handling and write an answer using `self.transport.write(bytes)`
-
-        if self.transport.can_write_eof():
-            self.transport.write_eof()
-        self.transport.close()
-
-    def eof_received(self) -> Optional[bool]:
-        self.logger.debug("Received EOF on transport (closing connection)")
-        if not self.transport.is_closing():
-            self.transport.close()
-        return False
-
-    def connection_lost(self, exc: Optional[Exception]) -> None:
-        if exc is None:
-            self.logger.debug("Lost connection to remote end")
-        else:
-            self.logger.debug("Lost connection to remote side (reason: %s)", str(exc), exc_info=exc)
-        if not self.transport.is_closing():
-            self.transport.close()

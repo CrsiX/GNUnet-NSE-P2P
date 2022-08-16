@@ -1,16 +1,15 @@
 import asyncio
 import logging
-from typing import Optional
+from typing import Callable, Optional
 
-from . import nse
 from .protocols import api
 
 
-class Client(asyncio.Protocol):
-    def __init__(self, api_data_type: int, srv: nse.Server):
+class Protocol(asyncio.Protocol):
+    def __init__(self, api_data_type: int, reconnect: Optional[Callable[[], None]] = None):
         self._data_type: int = api_data_type
         self._logger = logging.getLogger("gossip.client")
-        self._server: nse.Server = srv
+        self._reconnect: Optional[Callable[[], None]] = reconnect
         self.transport: Optional[asyncio.Transport] = None
 
     def connection_made(self, transport: asyncio.Transport) -> None:
@@ -35,4 +34,5 @@ class Client(asyncio.Protocol):
     def connection_lost(self, exc: Optional[Exception]) -> None:
         self._logger.error("Lost connection to gossip. Trying to re-connect ...", exc_info=exc)
         self.transport.close()
-        asyncio.get_event_loop().call_soon(self._server.reconnect_client())
+        if self._reconnect is not None:
+            asyncio.get_event_loop().call_soon(self._reconnect)

@@ -3,10 +3,8 @@
 import os
 import sys
 import shutil
-import asyncio
-import logging.config
 
-from . import config, utils, nse
+from . import config, entrypoint, utils
 
 
 def main() -> int:
@@ -24,24 +22,7 @@ def main() -> int:
             parser.print_usage(sys.stderr)
             raise
 
-        log_conf = {
-            "datefmt": conf.nse.log_dateformat,
-            "format": conf.nse.log_format,
-            "level": conf.nse.log_level,
-            "style": conf.nse.log_style
-        }
-        if conf.nse.log_file not in ["", "-", "stdout", "stderr"]:
-            log_conf["filename"] = conf.nse.log_file
-        elif conf.nse.log_file == "stderr":
-            log_conf["stream"] = sys.stderr
-        elif conf.nse.log_file == "stdout":
-            log_conf["stream"] = sys.stdout
-        logging.basicConfig(**log_conf)
-
-        try:
-            asyncio.run(nse.Server(conf).run())
-        except KeyboardInterrupt:
-            logging.getLogger("nse").info("Exiting")
+        entrypoint.start(conf)
 
     elif args.command == "config":
         if not args.force and os.path.exists(args.config):
