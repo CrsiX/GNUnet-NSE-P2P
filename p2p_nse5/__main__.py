@@ -6,7 +6,7 @@ import shutil
 import asyncio
 import logging.config
 
-from . import config, utils, server
+from . import config, utils, nse
 
 
 def main() -> int:
@@ -34,7 +34,7 @@ def main() -> int:
         )
 
         try:
-            asyncio.run(server.APIServer(conf).run())
+            asyncio.run(nse.Server(conf).run())
         except KeyboardInterrupt:
             logging.getLogger("nse").info("Exiting")
 

@@ -4,6 +4,7 @@ Configuration parser module
 
 import os
 import configparser
+import random
 
 import pydantic
 
@@ -27,22 +28,27 @@ class GossipConfiguration(pydantic.BaseModel):
 
 class NSEConfiguration(pydantic.BaseModel):
     api_address: str
+    api_data_type: int = random.randint(1, 65535)
+
+    logfile: str = "-"
+    proof_of_work_bits: int = 20
 
     @pydantic.validator("api_address")
     def is_valid_address_and_port(value: str):  # noqa
         utils.split_ip_address_and_port(value, True)
         return value
 
-
-class NSEDefaultConfiguration(pydantic.BaseModel):
-    proof_of_work_bits: int = 20
+    @pydantic.validator("api_data_type")
+    def is_valid_data_type_for_gossip_api(value: str):  # noqa
+        if not 1 <= int(value) < 65536:
+            raise ValueError(f"Data type value {value} out of range for uint16")
+        return value
 
 
 class Configuration(pydantic.BaseModel):
     host_key_file: str
     gossip: GossipConfiguration
     nse: NSEConfiguration
-    nse_override: NSEDefaultConfiguration = NSEDefaultConfiguration()
 
 
 def load_configuration(filenames: list[str]) -> Configuration:
