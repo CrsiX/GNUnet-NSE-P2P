@@ -19,7 +19,7 @@ class Manager:
         family, host, port = utils.split_ip_address_and_port(self._conf.gossip.api_address)
         try:
             self.gossip_transport, self._gossip_protocol = await loop.create_connection(
-                lambda: gossip.Protocol(self._conf.nse.api_data_type, self.reconnect_client), host, port, family=family
+                lambda: gossip.Protocol(self._conf.nse.data_type, self.reconnect_client), host, port, family=family
             )
 
         except Exception as exc:

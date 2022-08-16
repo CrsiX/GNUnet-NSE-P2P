@@ -29,7 +29,7 @@ class GossipConfiguration(pydantic.BaseModel):
 
 class NSEConfiguration(pydantic.BaseModel):
     api_address: str
-    api_data_type: int = random.randint(1, 65535)
+    data_type: int = 31337
     enforce_localhost: bool = True
 
     log_file: str = "-"  # also supports stdout and stderr
@@ -47,7 +47,7 @@ class NSEConfiguration(pydantic.BaseModel):
         utils.split_ip_address_and_port(value, True)
         return value
 
-    @pydantic.validator("api_data_type")
+    @pydantic.validator("data_type")
     def is_valid_data_type_for_gossip_api(value: str):  # noqa
         if not 1 <= int(value) < 65536:
             raise ValueError(f"Data type value {value} out of range for uint16")

@@ -1,6 +1,6 @@
-import dataclasses
 import struct
-from typing import Tuple, Union
+import dataclasses
+from typing import Iterable, Optional, Tuple
 
 from .msg_types import MessageType
 
@@ -36,11 +36,15 @@ def pack_nse_estimate(peers: int, std_deviation: int) -> bytes:
     return struct.Struct("!HHII").pack(12, MessageType.NSE_ESTIMATE, peers, std_deviation)
 
 
-def unpack_incoming_message(msg: bytes) -> Tuple[int, Union[bool, GossipNotification]]:
+def unpack_incoming_message(
+        msg: bytes,
+        expected_types: Optional[Iterable[int]] = None
+) -> Tuple[int, Optional[GossipNotification]]:
     """
     Parse, validate and unpack an incoming API message into type and data
 
     :param msg: incoming unchecked message in raw bytes
+    :param expected_types: iterable of expected message types
     :return: tuple of the message type identifier and the
         unpacked value specific to the specific message type
     :raises InvalidMessage: when an unsupported message type was
@@ -55,8 +59,14 @@ def unpack_incoming_message(msg: bytes) -> Tuple[int, Union[bool, GossipNotifica
             raise InvalidMessage("Invalid length field value")
     except (ValueError, struct.error) as exc:
         raise InvalidMessage("Invalid header start") from exc
+    try:
+        msg_type_name = MessageType(msg_type)
+    except ValueError as exc:
+        raise InvalidMessage(f"Unknown API message type '{msg_type}'") from exc
+    if expected_types and msg_type not in expected_types:
+        raise InvalidMessage(f"Unexpected message type {msg_type_name!s}")
     if msg_type == MessageType.NSE_QUERY:
-        return msg_type, True
+        return msg_type, None
     elif msg_type == MessageType.GOSSIP_NOTIFICATION:
         if size < 8:
             raise InvalidMessage("Message too short")

@@ -7,7 +7,7 @@ from typing import ClassVar, Optional
 import sqlalchemy.orm
 
 from . import config, utils
-from .protocols import api
+from .protocols import api, msg_types
 
 
 class Protocol(asyncio.Protocol):
@@ -42,14 +42,11 @@ class Protocol(asyncio.Protocol):
 
     def data_received(self, data: bytes) -> None:
         try:
-            msg_type, value = api.unpack_incoming_message(data)
-            self.logger.info(f"Incoming API message: {msg_type=!r} {value=!r}")
+            api.unpack_incoming_message(data, [msg_types.MessageType.NSE_QUERY])
+            self.logger.info(f"Incoming API message: NSE_QUERY")
         except api.InvalidMessage as exc:
             self.logger.warning(f"Invalid API message: {exc}")
-            if len(data) < 80:
-                self.logger.debug("Full data: %s", data)
-            else:
-                self.logger.debug(f"Full data is {len(data)} bytes long. Skipped as too big API message.")
+            self.logger.debug(f"First {min(len(data), 80)} bytes of incoming ignored/invalid message: {data[:80]}")
 
         # TODO: Do message handling and write an answer using `self.transport.write(bytes)`
 
