@@ -6,7 +6,7 @@ from typing import ClassVar, Optional
 
 import sqlalchemy.orm
 
-from . import config, persistence, utils
+from . import config, utils
 from .protocols import api
 
 
