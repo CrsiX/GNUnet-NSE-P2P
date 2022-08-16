@@ -3,7 +3,7 @@ import logging
 from typing import Callable, ClassVar, Optional
 
 from . import utils
-from .protocols import api, msg_types
+from .protocols import api, msg_types, p2p
 
 
 class Protocol(asyncio.Protocol):
@@ -33,8 +33,17 @@ class Protocol(asyncio.Protocol):
         except api.InvalidMessage as exc:
             self.logger.warning(f"Invalid API message: {exc}")
             self.logger.debug(f"First {min(len(data), 80)} bytes of incoming ignored/invalid message: {data[:80]}")
+            return
 
-        # TODO: Handle GOSSIP_NOTIFICATION, then send GOSSIP_VALIDATION, but don't close the connection
+        try:
+            notification = p2p.unpack_message(value.data)
+            self.transport.write(api.pack_gossip_validation(value.message_id, True))
+        except ValueError as exc:
+            self.logger.warning(f"Invalid GOSSIP_NOTIFICATION: {exc}")
+            self.transport.write(api.pack_gossip_validation(value.message_id, False))
+            return
+
+        # TODO: Handle ProtocolMessage `notification`
 
     def eof_received(self) -> Optional[bool]:
         self.logger.error("Received EOF from gossip. Trying to re-connect ...")

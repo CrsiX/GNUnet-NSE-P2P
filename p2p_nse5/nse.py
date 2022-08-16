@@ -47,6 +47,7 @@ class Protocol(asyncio.Protocol):
         except api.InvalidMessage as exc:
             self.logger.warning(f"Invalid API message: {exc}")
             self.logger.debug(f"First {min(len(data), 80)} bytes of incoming ignored/invalid message: {data[:80]}")
+            return
 
         # TODO: Do message handling and write an answer using `self.transport.write(bytes)`
 
