@@ -3,7 +3,7 @@ import asyncio
 import logging
 from typing import Optional
 
-from . import config, gossip, handler, utils
+from . import config, gossip, nse, persistence, utils
 
 
 class Manager:
@@ -49,7 +49,7 @@ class Manager:
         await self._start_gossip_client(event_loop, True)
         family, host, port = utils.split_ip_address_and_port(self._conf.nse.api_address)
         self._server = await event_loop.create_server(
-            lambda: handler.APIProtocol(self._conf), host, port, family=family
+            lambda: nse.Protocol(self._conf), host, port, family=family
         )
         self._logger.info("API server started on host %s and port %d", host, port)
         async with self._server:
@@ -74,6 +74,9 @@ def start(conf: config.Configuration):
 
     logger = logging.getLogger("entrypoint")
     logger.debug("Starting...")
+
+    persistence.init(conf.nse.database)
+
     try:
         asyncio.run(Manager(conf).run())
     except KeyboardInterrupt:

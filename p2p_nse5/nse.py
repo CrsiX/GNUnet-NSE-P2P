@@ -33,7 +33,7 @@ class Protocol(asyncio.Protocol):
         else:
             raise RuntimeError("Unsupported address family")
 
-        if not ip.is_loopback:
+        if not ip.is_loopback and self.config.nse.enforce_localhost:
             self.logger.warning("Blocked incoming connection from %s port %d (not localhost!)", host, port)
             self.transport.write_eof()
             self.transport.close()

@@ -3,12 +3,13 @@ Configuration parser module
 """
 
 import os
-import configparser
 import random
+import configparser
 
 import pydantic
 
-from . import utils
+from . import persistence, utils
+from .protocols import p2p
 
 
 DEFAULT_SECTION = "_default"
@@ -29,13 +30,17 @@ class GossipConfiguration(pydantic.BaseModel):
 class NSEConfiguration(pydantic.BaseModel):
     api_address: str
     api_data_type: int = random.randint(1, 65535)
+    enforce_localhost: bool = True
 
     log_file: str = "-"  # also supports stdout and stderr
     log_level: str = "DEBUG"
     log_style: str = "{"
     log_format: str = "{asctime}: [{levelname:<8}] {name}: {message}"
     log_dateformat: str = "%d.%m.%Y %H:%M:%S"
-    proof_of_work_bits: int = 20
+
+    database: str = persistence.DEFAULT_DATABASE_URL
+
+    proof_of_work_bits: int = p2p.DEFAULT_PROOF_OF_WORK_BITS
 
     @pydantic.validator("api_address")
     def is_valid_address_and_port(value: str):  # noqa

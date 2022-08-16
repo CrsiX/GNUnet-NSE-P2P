@@ -18,7 +18,6 @@ DEFAULT_DATABASE_URL: str = f"sqlite:////tmp/nse_{''.join(random.choice(string.a
 Base = declarative_base()
 _engine: Optional[_Engine] = None
 _make_session: Optional[sessionmaker] = None
-_logger: logging.Logger = logging.getLogger("persistence")
 
 
 class Peer(Base):
@@ -82,6 +81,12 @@ def init(database_url: str, create_all: bool = True):
     """
 
     global _engine, _make_session
+    if database_url == DEFAULT_DATABASE_URL:
+        logging.getLogger("persistence").warning(
+            f"Using the default database URL {database_url!r} may provide no persistent "
+            f"and reliable data storage, please adjust the program settings."
+        )
+
     if database_url.startswith("sqlite:"):
         _engine = create_engine(database_url, echo=False, connect_args={"check_same_thread": False})
     else:
@@ -94,7 +99,7 @@ def init(database_url: str, create_all: bool = True):
 
 
 def _warn(obj: str):
-    _logger.warning(
+    logging.getLogger("persistence").warning(
         f"Database {obj} not initialized! Using default database URL with database "
         f"{DEFAULT_DATABASE_URL!r}. Call 'init' once at program startup to fix "
         f"future problems due to non-persistent database and suppress this warning."

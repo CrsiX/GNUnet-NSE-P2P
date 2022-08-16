@@ -25,7 +25,6 @@ HASHED_HEADER = struct.Struct("!xBHQQ")
 HEADER_LENGTH = 22
 SIGNATURE_LENGTH = 512
 
-# This is a sane fallback value, but the real "default" is set in the configuration module
 DEFAULT_PROOF_OF_WORK_BITS = 20
 HASH_ENDIAN = "big"
 
