@@ -27,5 +27,5 @@ class CLITests(unittest.TestCase):
         t.start()
         default = "p2p_nse5/static/default_configuration.ini"
         with self.assertRaises(subprocess.TimeoutExpired):
-            subprocess.run([sys.executable, "-m", "p2p_nse5", "-c", default, "run"], timeout=0.5, capture_output=False)
+            subprocess.run([sys.executable, "-m", "p2p_nse5", "-c", default, "run"], timeout=0.5, capture_output=True)
         t.join()

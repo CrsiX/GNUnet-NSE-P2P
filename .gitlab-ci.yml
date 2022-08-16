@@ -60,10 +60,9 @@ unittest-3.10-bullseye:
 unittest-3.10-alpine:
   stage: test
   image: python:3.10-alpine
-  allow_failure: true
   script:
     - apk update
-    - apk add gcc
+    - apk add gcc libc-dev
     - pip install -r requirements.txt
     - python -m tests -v
 
@@ -77,10 +76,9 @@ unittest-3.9-bullseye:
 unittest-3.9-alpine:
   stage: test
   image: python:3.9-alpine
-  allow_failure: true
   script:
     - apk update
-    - apk add gcc
+    - apk add gcc libc-dev
     - pip install -r requirements.txt
     - python -m tests -v
 
