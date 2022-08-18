@@ -70,13 +70,11 @@ def calculate_proximity(rsa_key: RSA.RsaKey, value: Union[int, bytes]) -> int:
     # Using binary representations and string operations is hacky but easy
     n = bin(rsa_key.public_key().n)[2:]
     h = bin(int.from_bytes(hashlib.sha256(value).digest(), HASH_ENDIAN))[2:]
-    while len(h) < 256:
+    for c in range(256-len(h)):
         h = "0" + h
-    c = 0
     proximity = 0
-    while c < 256 and h[c] == n[c]:
+    while proximity < 256 and h[proximity] == n[proximity]:
         proximity += 1
-        c += 1
     return proximity
 
 
