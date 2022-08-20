@@ -1,13 +1,15 @@
+import math
+import time
 import socket
 import asyncio
 import logging
 import ipaddress
-from typing import ClassVar, Optional
+from typing import Callable, ClassVar, Optional
 
 import sqlalchemy.orm
 
-from . import config, utils
-from .protocols import api, msg_types
+from . import config, persistence, utils
+from .protocols import api, msg_types, p2p
 
 
 class Protocol(asyncio.Protocol):
@@ -68,3 +70,16 @@ class Protocol(asyncio.Protocol):
             self.logger.debug("Lost connection to remote side (reason: %s)", str(exc), exc_info=exc)
         if not self.transport.is_closing():
             self.transport.close()
+
+
+class RoundHandler:
+    """
+    Handler class for a single iteration (round) of the GNUnet NSE algorithm
+    """
+
+    def __init__(self, conf: config.Configuration, write: Callable[[bytes], bool]):
+        self._conf = conf
+        self._write = write
+        self._current_round = int(time.time()) // self._conf.nse.frequency
+        self._own_proximity = p2p.calculate_proximity(self._conf.private_key, self._current_round)
+        self.logger: logging.Logger = logging.getLogger(f"nse.round.{self._current_round}")

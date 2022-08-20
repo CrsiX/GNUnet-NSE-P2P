@@ -1,9 +1,11 @@
 import sys
+import time
 import asyncio
 import logging
 from typing import Optional
 
 from . import config, gossip, nse, persistence, utils
+from .protocols import api
 
 
 class Manager:
@@ -44,8 +46,34 @@ class Manager:
         loop = asyncio.get_event_loop()
         loop.create_task(self._start_gossip_client(loop))
 
+    def _send_gossip_announce(self, data: bytes) -> bool:
+        """
+        Write arbitrary data as gossip announcement to the current network transport to the gossip API
+
+        This function must be called in the context of an async function.
+
+        :param data: arbitrary data in bytes
+        :return: bool whether writing the data completed successfully
+        """
+
+        msg = api.pack_gossip_announce(self._conf.nse.data_type, data, self._conf.nse.data_gossip_ttl)
+        if self.gossip_transport is None:
+            self.reconnect_client()
+            return False
+        self.gossip_transport.write(msg)
+        return True
+
+    async def _schedule_nse_round(self):
+        f = self._conf.nse.frequency
+        await asyncio.sleep(f - int(time.time()) % f - 1)
+        self._logger.debug(f"Triggering next NSE round participation (current time: {int(time.time())})")
+        asyncio.get_running_loop().create_task(nse.RoundHandler(self._conf, self._send_gossip_announce).run())
+        await asyncio.sleep(1)
+        asyncio.get_running_loop().create_task(self._schedule_nse_round())
+
     async def run(self):
         event_loop = asyncio.get_running_loop()
+        event_loop.create_task(self._schedule_nse_round())
         await self._start_gossip_client(event_loop, True)
         family, host, port = utils.split_ip_address_and_port(self._conf.nse.api_address)
         self._server = await event_loop.create_server(

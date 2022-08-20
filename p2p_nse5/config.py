@@ -31,6 +31,7 @@ class GossipConfiguration(pydantic.BaseModel):
 class NSEConfiguration(pydantic.BaseModel):
     api_address: str
     data_type: int = 31337
+    data_gossip_ttl: int = 64
     enforce_localhost: bool = True
 
     log_file: str = "-"  # also supports stdout and stderr
@@ -43,6 +44,7 @@ class NSEConfiguration(pydantic.BaseModel):
 
     frequency: int = 1800  # in seconds
     respected_rounds: int = 8  # number of rounds to use in the calculation of the approx. net size
+    max_burst_delay:  int = 5000  # in milliseconds
     proof_of_work_bits: int = p2p.DEFAULT_PROOF_OF_WORK_BITS
 
     @pydantic.validator("api_address")
