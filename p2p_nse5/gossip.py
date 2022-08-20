@@ -7,6 +7,10 @@ from .protocols import api, msg_types, p2p
 
 
 class Protocol(asyncio.Protocol):
+    """
+    Implementation of the API protocol to/from the gossip module dependency using the asyncio framework
+    """
+
     _instance_counter: ClassVar = utils.counter()
 
     def __init__(self, data_type: int, reconnect: Optional[Callable[[], None]] = None):
@@ -37,17 +41,23 @@ class Protocol(asyncio.Protocol):
 
         try:
             notification = p2p.unpack_message(value.data)
-            self.transport.write(api.pack_gossip_validation(value.message_id, True))
+
+            # TODO: Handle ProtocolMessage `notification` and set `outdated` if the notification has a low proximity
+            outdated = False
+
+            # TODO: Should we also answer with an immediate update indicating a higher proximity to the specified peer?
+            #  This is only possible if our NSE module had its own P2P connectivity to other peers in the network.
+
+            self.transport.write(api.pack_gossip_validation(value.message_id, not outdated))
         except ValueError as exc:
             self.logger.warning(f"Invalid GOSSIP_NOTIFICATION: {exc}")
             self.transport.write(api.pack_gossip_validation(value.message_id, False))
-            return
-
-        # TODO: Handle ProtocolMessage `notification`
 
     def eof_received(self) -> Optional[bool]:
         self.logger.error("Received EOF from gossip. Trying to re-connect ...")
         self.transport.close()
+        if self._reconnect is not None:
+            asyncio.get_event_loop().call_soon(self._reconnect)
         return False
 
     def connection_lost(self, exc: Optional[Exception]) -> None:

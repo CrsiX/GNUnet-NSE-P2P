@@ -29,9 +29,9 @@ class Peer(Base):
 
     id: int = Column(Integer, nullable=False, primary_key=True, autoincrement=True, unique=True)
     public_key: bytes = Column(LargeBinary, nullable=False, unique=True)
-    """RSA 4096 public key of the remote peer in DEM binary format"""
+    """RSA 4096 bit public key of the remote peer in DEM binary format"""
     interactions: int = Column(Integer, nullable=False, default=1)
-    """Counter how often our NSE module contacted the peer's NSE module or vice versa"""
+    """Counter how often we received information from the other peer's NSE module"""
     created: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now())
     updated: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
 

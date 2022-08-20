@@ -27,18 +27,20 @@ class Manager:
         except Exception as exc:
             if first:
                 if self.gossip_transport is None:
-                    self._logger.critical("Failed to create a connection to gossip on %s port %d: %s", host, port, exc)
+                    self._logger.critical(f"Failed to create a connection to gossip on {host} port {port}: {exc}")
                 raise
-            self._logger.warning("Failed to connect to gossip: %s", exc)
+            if self.gossip_transport.is_closing():
+                self.gossip_transport = None
+            self._logger.warning(f"Failed to connect to gossip: {exc}")
             delay = 1.5 ** self._gossip_fails
             self._gossip_fails += 1
-            self._logger.debug("Sleeping for %.2f seconds before the next re-connect attempt ...", delay)
+            self._logger.debug(f"Sleeping for {delay:.2f} seconds before the next re-connect attempt ...", delay)
             await asyncio.sleep(delay)
             loop.create_task(self._start_gossip_client(loop))
             return False
 
         if self._gossip_fails > 0:
-            self._logger.info("Successfully established a gossip connection after %d attempts", self._gossip_fails)
+            self._logger.info(f"Successfully established a gossip connection after {self._gossip_fails} attempts")
             self._gossip_fails = 0
         return True
 
