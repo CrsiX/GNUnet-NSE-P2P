@@ -13,6 +13,10 @@ from .protocols import api, msg_types, p2p
 
 
 class Protocol(asyncio.Protocol):
+    """
+    Implementation of the API protocol for the NSE module using the asyncio framework
+    """
+
     _instance_counter: ClassVar = utils.counter()
 
     def __init__(self, configuration: config.Configuration):
@@ -83,3 +87,57 @@ class RoundHandler:
         self._current_round = int(time.time()) // self._conf.nse.frequency
         self._own_proximity = p2p.calculate_proximity(self._conf.private_key, self._current_round)
         self.logger: logging.Logger = logging.getLogger(f"nse.round.{self._current_round}")
+
+    async def run(self) -> None:
+        """
+        Execute the NSE round handler algorithm based on GNUnet NSE
+
+        Rough description of this function:
+          1. Get the previous network size estimate
+          2. Wait a delay based on our proximity (lower proximity waits longer)
+          3. Lookup whether some better proximity for the current round appeared while waiting
+          4. If we're worse than the current proximity, return
+          5. Otherwise announce our own proximity in a valid P2P message to the gossip API
+
+        :return: None
+        """
+
+        # Get the previous estimate either from the database or use 1 for the first round
+        previous_estimate = 1.0
+        with persistence.get_new_session() as session:
+            rounds = list(sorted(
+                session.query(persistence.Round).filter_by(round=self._current_round-1).all(),
+                key=lambda o: int(o.proximity),
+                reverse=True
+            ))
+            if len(rounds) > 0:
+                previous_estimate = calc_size_estimate(rounds[0].proximity)
+            # TODO: Optional improvement: store the past estimates in the database,
+            #  then this lookup doesn't only depend on the very last round (use a new table!)
+
+        delay = self.get_delay(self._conf.nse.frequency, self._own_proximity, previous_estimate)
+        self.logger.debug(f"Starting... (round={self._current_round}, proximity={self._own_proximity}, delay={delay})")
+        await asyncio.sleep(delay)
+
+        # TODO: Lookup whether some better proximity for the current round appeared while waiting, then return
+
+        msg = p2p.build_message(self._conf.private_key, self._current_round, self.logger, self._own_proximity)
+        success = self._write(msg)
+        self.logger.debug(f"Announce {['failed', 'succeeded'][success]}! Message: {msg}")
+        if not success:
+            self.logger.warning("Failed to sent a gossip announcement successfully!")
+
+    @staticmethod
+    def get_delay(frequency: int, proximity: int, previous_estimate: float) -> float:
+        return frequency / 2 - (frequency / math.pi * math.atan(proximity - previous_estimate))
+
+
+def calc_size_estimate(expected_max_proximity: int) -> float:
+    """
+    Calculate a rough estimate of the current network size
+
+    :param expected_max_proximity: expected number of max bits of proximity
+    :return: estimated network size (it's a float, use with care)
+    """
+
+    return 2 ** (expected_max_proximity - 0.332747)
