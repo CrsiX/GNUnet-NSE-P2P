@@ -3,10 +3,11 @@ Configuration parser module
 """
 
 import os
-import random
 import configparser
+from typing import Any
 
 import pydantic
+import Crypto.PublicKey.RSA
 
 from . import persistence, utils
 from .protocols import p2p
@@ -40,6 +41,8 @@ class NSEConfiguration(pydantic.BaseModel):
 
     database: str = persistence.DEFAULT_DATABASE_URL
 
+    frequency: int = 1800  # in seconds
+    respected_rounds: int = 8  # number of rounds to use in the calculation of the approx. net size
     proof_of_work_bits: int = p2p.DEFAULT_PROOF_OF_WORK_BITS
 
     @pydantic.validator("api_address")
@@ -58,6 +61,17 @@ class Configuration(pydantic.BaseModel):
     host_key_file: str
     gossip: GossipConfiguration
     nse: NSEConfiguration
+    host_key: Crypto.PublicKey.RSA.RsaKey = None
+
+    def __init__(self, **data: Any) -> None:
+        super().__init__(**data)
+        with open(self.host_key_file, "r") as f:
+            content = f.read()
+        # Note that the unencrypted RSA private key is kept in memory here!
+        self.host_key = Crypto.PublicKey.RSA.import_key(content)
+
+    class Config:
+        arbitrary_types_allowed: bool = True
 
 
 def load_configuration(filenames: list[str]) -> Configuration:
