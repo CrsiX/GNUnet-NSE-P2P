@@ -58,23 +58,32 @@ class NSEConfiguration(pydantic.BaseModel):
 
 
 class Configuration(pydantic.BaseModel):
-    host_key_file: str
+    hostkey: str  # noqa
     gossip: GossipConfiguration
     nse: NSEConfiguration
-    host_key: Crypto.PublicKey.RSA.RsaKey = None
+    _host_key: Crypto.PublicKey.RSA.RsaKey = None
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
-        with open(self.host_key_file, "r") as f:
+        with open(self.hostkey, "r") as f:
             content = f.read()
         # Note that the unencrypted RSA private key is kept in memory here!
-        self.host_key = Crypto.PublicKey.RSA.import_key(content)
+        self._host_key = Crypto.PublicKey.RSA.import_key(content)
+
+    @property
+    def private_key(self) -> Crypto.PublicKey.RSA.RsaKey:
+        return self._host_key
+
+    @property
+    def public_key(self) -> Crypto.PublicKey.RSA.RsaKey:
+        return self._host_key.public_key()
 
     class Config:
         arbitrary_types_allowed: bool = True
+        underscore_attrs_are_private: bool = True
 
 
-def load_configuration(filenames: list[str]) -> Configuration:
+def load(filenames: list[str]) -> Configuration:
     """
     Load a :class:`Configuration` object from a list of INI-style config files
 

@@ -34,9 +34,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
 
     commands = parser.add_subparsers(title="commands", dest="command", required=True)
-    commands.add_parser("run")
-    config_parser = commands.add_parser("config")
+    commands.add_parser("run", help="execute the program running the NSE module")
+    config_parser = commands.add_parser("new", help="create a new configuration file (for a new program instance)")
     config_parser.add_argument("-f", "--force", action="store_true", help="allow overwriting existing files")
+    commands.add_parser(
+        "validate",
+        help="validate the configuration file by showing the parsed values incl. defaults "
+             "but excluding all irrelevant options (possibly from other modules)"
+    )
     return parser
 
 
