@@ -5,11 +5,12 @@ Module with various different utilities
 import socket
 import argparse
 import ipaddress
-from typing import Tuple
+from typing import List, Optional, Tuple
 
 import pydantic
+import sqlalchemy.orm
 
-from . import config
+from . import config, persistence
 
 
 def counter(start: int = 0):
@@ -38,7 +39,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(title="commands", dest="command", required=True)
 
     parser_run = add_conf_option(commands.add_parser("run", help="execute the program running the NSE module"))
-    parser_run.add_argument("-l", "--listen", type=int, help="overwrite local API listen address")
+    parser_run.add_argument("-l", "--listen", help="overwrite local API listen address")
 
     parser_new = add_conf_option(commands.add_parser(
         "new",
@@ -88,3 +89,16 @@ def split_ip_address_and_port(value: str, require_localhost: bool = False) -> Tu
         if require_localhost and not ipaddress.IPv4Address(ip).is_loopback:
             raise ValueError(f"IPv4 {ip} is no address of localhost")
         return socket.AF_INET, ip, port
+
+
+def get_rounds(
+        session: sqlalchemy.orm.Session,
+        round_id: int,
+        backlog: Optional[bool] = None
+) -> List[persistence.Round]:
+    # TODO: Docstring
+    if backlog is None:
+        rs = session.query(persistence.Round).filter_by(round=round_id).all()
+    else:
+        rs = session.query(persistence.Round).filter_by(round=round_id, backlog=backlog).all()
+    return list(sorted(rs, key=lambda o: int(o.proximity), reverse=True))
