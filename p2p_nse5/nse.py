@@ -9,7 +9,7 @@ from typing import Callable, ClassVar, Optional, Union
 import sqlalchemy.orm
 
 from . import config, persistence, utils
-from .protocols import api, msg_types, p2p
+from .protocols import api, p2p
 
 
 class Protocol(asyncio.Protocol):
@@ -48,7 +48,7 @@ class Protocol(asyncio.Protocol):
 
     def data_received(self, data: bytes) -> None:
         try:
-            api.unpack_incoming_message(data, [msg_types.MessageType.NSE_QUERY])
+            api.unpack_incoming_message(data, [api.MessageType.NSE_QUERY])
             self.logger.info("Incoming API message: NSE_QUERY")
         except api.InvalidMessage as exc:
             self.logger.warning(f"Invalid API message: {exc}")

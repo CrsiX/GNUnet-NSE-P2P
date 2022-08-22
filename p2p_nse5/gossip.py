@@ -5,7 +5,7 @@ import logging
 from typing import Callable, ClassVar, Optional
 
 from . import config, persistence, utils
-from .protocols import api, msg_types, p2p
+from .protocols import api, p2p
 
 
 class Protocol(asyncio.Protocol):
@@ -34,7 +34,7 @@ class Protocol(asyncio.Protocol):
 
     def data_received(self, data: bytes) -> None:
         try:
-            msg_type, value = api.unpack_incoming_message(data, [msg_types.MessageType.GOSSIP_NOTIFICATION])
+            msg_type, value = api.unpack_incoming_message(data, [api.MessageType.GOSSIP_NOTIFICATION])
             self.logger.debug(f"Incoming API message: {msg_type=!r}")
         except api.InvalidMessage as exc:
             self.logger.warning(f"Invalid API message: {exc}")
