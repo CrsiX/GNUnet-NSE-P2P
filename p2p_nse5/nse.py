@@ -49,7 +49,7 @@ class Protocol(asyncio.Protocol):
     def data_received(self, data: bytes) -> None:
         try:
             api.unpack_incoming_message(data, [msg_types.MessageType.NSE_QUERY])
-            self.logger.info(f"Incoming API message: NSE_QUERY")
+            self.logger.info("Incoming API message: NSE_QUERY")
         except api.InvalidMessage as exc:
             self.logger.warning(f"Invalid API message: {exc}")
             self.logger.debug(f"First {min(len(data), 80)} bytes of incoming ignored/invalid message: {data[:80]}")
