@@ -1,11 +1,8 @@
 #!/usr/bin/python3
 
 import argparse
-import hexdump
 import socket
 import struct
-
-from Crypto.PublicKey import RSA
 
 from util import sync_bad_packet, connect_socket, sync_read_message
 
@@ -15,6 +12,7 @@ SERV_PORT = 7101
 RPS_QUERY = 540
 RPS_PEER = 541
 
+
 def send_rps_query(sock):
     size = 4
     buf = struct.pack(f">HH",
@@ -22,6 +20,7 @@ def send_rps_query(sock):
                       RPS_QUERY)
     sock.send(buf)
     print(f"[+] Sent RPS query...")
+
 
 def main():
     host = SERV_ADDR
@@ -62,7 +61,7 @@ def main():
                                                                 inbuf[:8])
             portmap = {}
             for i in range(nports):
-                start = 8 + i*4
+                start = 8 + i * 4
                 end = start + 4
                 app, port = struct.unpack(">HH", inbuf[start:end])
                 portmap[app] = port
@@ -72,9 +71,9 @@ def main():
             else:
                 iplen = 4
 
-            inaddr = inbuf[end:end+iplen]
+            inaddr = inbuf[end:end + iplen]
             inaddr = socket.inet_ntoa(inaddr)
-            inkey = inbuf[end+iplen:]
+            inkey = inbuf[end + iplen:]
 
         except Exception:
             sync_bad_packet(inbuf, s)
@@ -87,8 +86,6 @@ def main():
         print(f"\nIP address: {inaddr}\nPortmap:")
         for key in portmap.keys():
             print(f"\t{key} => {portmap[key]}")
-        print("\nPeer-Key:\n")
-        hexdump.hexdump(inkey)
 
         if not args.cont:
             break
@@ -100,6 +97,7 @@ def main():
             break
 
     s.close()
+
 
 if __name__ == '__main__':
     main()

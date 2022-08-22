@@ -1,13 +1,11 @@
 #!/usr/bin/python3
 
 import argparse
-import hexdump
 import socket
 import struct
 import sys
 
 from Crypto.PublicKey import RSA
-from rsa import PublicKey
 
 MOCKUP_ADDR = "127.0.0.1"
 MOCKUP_PORT = 7101
@@ -17,7 +15,7 @@ RPS_PEER = 541
 
 APP_ONION = 560
 
-RET_PEER_ADDR_FLAG = 0 # 0 ~ IPv4; 1 ~ IPv6
+RET_PEER_ADDR_FLAG = 0  # 0 ~ IPv4; 1 ~ IPv6
 RET_PEER_ADDR = "127.0.0.1"
 RET_PEER_HOSTKEY_PATH = './peer2.pub'
 RET_PEER_PORT = 6001
@@ -29,26 +27,23 @@ RET_PEER_HOSTKEY_PATH2 = './peer3.pub'
 RET_PEER_PORT2 = 6303
 RET_PEER_ONION_PORT2 = 6303
 
+
 def read_pem_to_der(path):
     f = open(path, 'r')
     key = RSA.importKey(f.read())
     return key.exportKey('DER')
 
-def alternative_read_pem_to_der(path):
-    f = open(path, 'r')
-    key = PublicKey.load_pkcs1(f.read(), 'PEM')
-    return key.save_pkcs1('DER')
 
 def bad_packet(buf, sock):
-    print("[-] Unknown or malformed data received:")
-    hexdump.hexdump(buf)
+    print("[-] Unknown or malformed data received")
     print("[-] Exiting.")
     sock.close()
     sys.exit(-1)
 
+
 def get_incoming_conn_socket(addr, port):
     print("[+] Listening for incoming connections on"
-          +f" {addr}:{port}")
+          + f" {addr}:{port}")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
@@ -60,10 +55,11 @@ def get_incoming_conn_socket(addr, port):
     print(f"[+] Peer connected from {addr_info}")
     return conn
 
+
 def build_answer_payload(addr, port, portmap, keypath):
     pkey_der = read_pem_to_der(keypath)
-#    pkey_der = alternative_read_pem_to_der(keypath)
-    msize = 8 + 4 + len(portmap)*4 + len(pkey_der)
+    #    pkey_der = alternative_read_pem_to_der(keypath)
+    msize = 8 + 4 + len(portmap) * 4 + len(pkey_der)
     ip = socket.inet_aton(addr)
     buf = struct.pack(f">HHHBB",
                       msize,
@@ -80,6 +76,7 @@ def build_answer_payload(addr, port, portmap, keypath):
     buf += pkey_der
     return buf
 
+
 def main():
     host = MOCKUP_ADDR
     port = MOCKUP_PORT
@@ -87,12 +84,12 @@ def main():
     first_peer_addr = RET_PEER_ADDR
     first_peer_port = RET_PEER_PORT
     first_peer_key = RET_PEER_HOSTKEY_PATH
-    first_portmap = {APP_ONION : RET_PEER_ONION_PORT}
+    first_portmap = {APP_ONION: RET_PEER_ONION_PORT}
 
     second_peer_addr = RET_PEER_ADDR2
     second_peer_port = RET_PEER_PORT
     second_peer_key = RET_PEER_HOSTKEY_PATH2
-    second_portmap = {APP_ONION : RET_PEER_ONION_PORT2}
+    second_portmap = {APP_ONION: RET_PEER_ONION_PORT2}
 
     # parse commandline arguments
     usage_string = ("Run an RPS mockup server. Supports up to two alternating,"
@@ -113,7 +110,7 @@ def main():
                      help="Address:Port of the second peer to return")
     cmd.add_argument("-2p", "--secports",
                      help="Comma-separated list of APP:PORT pairs of the"
-                         + " second peer")
+                          + " second peer")
     cmd.add_argument("-2k", "--seckey",
                      help="Path to the PEM pubkey of the sec peer")
     args = cmd.parse_args()
@@ -122,7 +119,6 @@ def main():
         host = args.address
     if args.port is not None:
         port = int(args.port)
-
 
     if args.firstpeer is not None:
         if (args.firstports is None) or (args.firstkey is None):
@@ -165,7 +161,6 @@ def main():
                                         first_peer_port,
                                         first_portmap,
                                         first_peer_key)
-    hexdump.hexdump(first_answer)
 
     if args.secpeer is not None:
         second_answer = build_answer_payload(second_peer_addr,
@@ -173,7 +168,6 @@ def main():
                                              second_portmap,
                                              second_peer_key)
         print("--------")
-        hexdump.hexdump(second_answer)
 
     # open a socket and listen for incoming connections
     conn = get_incoming_conn_socket(host, port)

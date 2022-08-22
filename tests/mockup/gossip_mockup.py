@@ -2,7 +2,6 @@
 
 import argparse
 import asyncio
-import hexdump
 import random
 import socket
 import struct
@@ -31,6 +30,7 @@ state_map_lock = None
 conn_mid_map = {}
 mid_map_lock = None
 
+
 async def add_mid(conn, mid, dtype):
     global conn_mid_map, mid_map_lock
     async with mid_map_lock:
@@ -43,8 +43,9 @@ async def add_mid(conn, mid, dtype):
             state[mid] = dtype
 
         except KeyError:
-            state = {mid:dtype}
+            state = {mid: dtype}
             conn_mid_map[conn] = state
+
 
 async def add_subscription(conn, dtype):
     global conn_state_map, state_map_lock
@@ -58,8 +59,9 @@ async def add_subscription(conn, dtype):
             state[dtype] = False
 
         except KeyError:
-            state = {dtype:False}
+            state = {dtype: False}
             conn_state_map[conn] = state
+
 
 async def clear_state(conn):
     global conn_state_map, state_map_lock, conn_mid_map, mid_map_lock
@@ -74,6 +76,7 @@ async def clear_state(conn):
         except KeyError:
             pass
 
+
 async def is_subscribed(conn, dtype):
     global conn_state_map, state_map_lock
     async with state_map_lock:
@@ -87,6 +90,7 @@ async def is_subscribed(conn, dtype):
 
         return False
 
+
 async def get_subscribers_of(dtype):
     global conn_state_map, state_map_lock
     subscribers = []
@@ -99,6 +103,7 @@ async def get_subscribers_of(dtype):
                 subscribers.append(conn)
 
     return subscribers
+
 
 async def update_validation_state(conn, mid, valid):
     global conn_state_map, state_map_lock, conn_mid_map, mid_map_lock
@@ -126,6 +131,7 @@ async def update_validation_state(conn, mid, valid):
 
     return False
 
+
 async def send_gossip_notification(conn, dtype, data):
     reader, writer = conn
     raddr, rport = writer.get_extra_info('socket').getpeername()
@@ -149,11 +155,13 @@ async def send_gossip_notification(conn, dtype, data):
     else:
         await bad_packet(reader, writer, cleanup_func=clear_state)
 
+
 async def gossip_to_subscribers(dtype, data, originator):
     subs = await get_subscribers_of(dtype)
     for sub in subs:
         if sub != originator:
             await send_gossip_notification(sub, dtype, data)
+
 
 async def handle_gossip_announce(buf, reader, writer):
     raddr, rport = writer.get_extra_info('socket').getpeername()
@@ -181,8 +189,9 @@ async def handle_gossip_announce(buf, reader, writer):
 
     print(f"[+] {raddr}:{rport} >>> GOSSIP_ANNOUNCE: ({dtype}:{mdata})")
 
-    await gossip_to_subscribers(dtype, mdata, (reader,writer))
+    await gossip_to_subscribers(dtype, mdata, (reader, writer))
     return True
+
 
 async def handle_gossip_notify(buf, reader, writer):
     raddr, rport = writer.get_extra_info('socket').getpeername()
@@ -199,10 +208,11 @@ async def handle_gossip_notify(buf, reader, writer):
         return False
 
     res, dtype = struct.unpack(">HH", body)
-    await add_subscription((reader,writer), dtype)
+    await add_subscription((reader, writer), dtype)
 
     print(f"[+] {raddr}:{rport} >>> GOSSIP_NOTIFY registered: ({dtype})")
     return True
+
 
 async def handle_gossip_validation(buf, reader, writer):
     raddr, rport = writer.get_extra_info('socket').getpeername()
@@ -223,7 +233,7 @@ async def handle_gossip_validation(buf, reader, writer):
 
     print(f"[+] {raddr}:{rport} >>> GOSSIP_VALIDATION: ({mid}:{valid})")
 
-    if not await update_validation_state((reader,writer), mid, valid):
+    if not await update_validation_state((reader, writer), mid, valid):
         await bad_packet(reader, writer,
                          reason="GOSSIP_VALIDATION for nonexisting subscription",
                          data=buf,
@@ -231,6 +241,7 @@ async def handle_gossip_validation(buf, reader, writer):
         return False
 
     return True
+
 
 async def handle_message(buf, reader, writer):
     ret = False
@@ -254,13 +265,14 @@ async def handle_message(buf, reader, writer):
                          header)
     return ret
 
+
 def main():
     host = GOSSIP_ADDR
     port = GOSSIP_PORT
 
     # parse commandline arguments
     usage_string = ("Run a GOSSIP module mockup with local info exchange.\n\n"
-                   + "Multiple API clients can connect to this same instance.")
+                    + "Multiple API clients can connect to this same instance.")
     cmd = argparse.ArgumentParser(description=usage_string)
     cmd.add_argument("-a", "--address",
                      help="Bind server to this address")
@@ -284,7 +296,7 @@ def main():
     handler = (lambda r,
                       w,
                       mhandler=handle_message,
-                      cleanup=clear_state: handle_client(r,w,mhandler,cleanup))
+                      cleanup=clear_state: handle_client(r, w, mhandler, cleanup))
 
     serv = asyncio.start_server(handler,
                                 host=host, port=port,
@@ -299,6 +311,7 @@ def main():
     except KeyboardInterrupt as e:
         print("[i] Received SIGINT, shutting down...")
         loop.stop()
+
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,6 @@
 
 import argparse
 import asyncio
-import hexdump
 import socket
 import struct
 
@@ -15,6 +14,7 @@ NSE_DEVIATION = 42
 
 NSE_QUERY = 520
 NSE_ESTIMATE = 521
+
 
 async def handle_nse_query(buf, reader, writer):
     raddr, rport = writer.get_extra_info('socket').getpeername()
@@ -38,8 +38,8 @@ async def handle_nse_query(buf, reader, writer):
 
     return True
 
-async def handle_message(buf, reader, writer):
 
+async def handle_message(buf, reader, writer):
     ret = False
     header = buf[:4]
     body = buf[4:]
@@ -52,6 +52,7 @@ async def handle_message(buf, reader, writer):
                          f"Unknown message type {mtype} received",
                          header)
     return ret
+
 
 def main():
     global NSE_PEER_ESTIMATE, NSE_DEVIATION
@@ -98,6 +99,7 @@ def main():
     except KeyboardInterrupt as e:
         print("[i] Received SIGINT, shutting down...")
         loop.stop()
+
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import argparse
-import hexdump
 import socket
 import struct
 import time
@@ -19,14 +18,15 @@ DHT_FAILURE = 653
 
 HOST_DISCONNECTS = False
 
+
 def send_get(s, dht_key):
-    getreq = struct.pack(">HH32s", int((32+256)/8) , DHT_GET, dht_key)
+    getreq = struct.pack(">HH32s", int((32 + 256) / 8), DHT_GET, dht_key)
     print("[+] Sending GET request...")
     try:
         s.send(getreq)
     except Exception as e:
-       print(f"[-] Sending of packet failed: {e}.")
-       return False
+        print(f"[-] Sending of packet failed: {e}.")
+        return False
 
     buf = s.recv(4096)
     if buf == b'':
@@ -35,10 +35,10 @@ def send_get(s, dht_key):
 
     try:
         asize, atype = struct.unpack(">HH", buf[:4])
-        akey = buf[4:int(256/8)+4]
+        akey = buf[4:int(256 / 8) + 4]
 
         if atype == DHT_SUCCESS:
-            avalue = buf[int(256/8)+4:]
+            avalue = buf[int(256 / 8) + 4:]
             print(f"[+] Received DHT_SUCCESS."
                   + f" size: {asize}, key: {akey}, value: {avalue}")
         elif atype == DHT_FAILURE:
@@ -46,16 +46,15 @@ def send_get(s, dht_key):
                   + f" size: {asize}, key: {akey}")
         else:
             print("[-] Received unexpected answer")
-            hexdump.hexdump(buf)
     except Exception as e:
-       print(f"[-] Parsing of packet failed: {e}.")
-       hexdump.hexdump(buf)
+        print(f"[-] Parsing of packet failed: {e}.")
 
     return True
 
+
 def send_put(s, dht_key, dht_value):
     putreq = struct.pack(">HHHBB",
-                         (4+4+int(256/8)+len(dht_value)),
+                         (4 + 4 + int(256 / 8) + len(dht_value)),
                          DHT_PUT,
                          1,
                          1,
@@ -68,16 +67,18 @@ def send_put(s, dht_key, dht_value):
     try:
         s.send(putreq)
     except Exception as e:
-       print(f"[-] Sending of packet failed: {e}.")
-       return False
+        print(f"[-] Sending of packet failed: {e}.")
+        return False
 
     return True
+
 
 def get_socket(host, port):
     print(f"Trying to connect to {host}:{port}")
     s = socket.socket(socket.AF_INET, type=socket.SOCK_STREAM)
     s.connect((host, port))
     return s
+
 
 def main():
     host = target_ip
@@ -113,7 +114,7 @@ def main():
     if args.key is not None:
         key = bytes(args.key, encoding='utf-8')
         if len(key) != 32:
-            key += bytes(32-len(key))
+            key += bytes(32 - len(key))
 
     if args.data is not None:
         if len(args.data) >= 1:
@@ -150,6 +151,7 @@ def main():
             print(f"[+] Connected to {host}:{port}")
 
     s.close()
+
 
 if __name__ == '__main__':
     main()

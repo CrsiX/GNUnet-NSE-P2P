@@ -1,19 +1,21 @@
-import hexdump
 import socket
 import struct
 import sys
 
+
 def sync_bad_packet(buf, sock, reason="Unknown or malformed data received"):
     print(f"[-] {reason}:")
-    hexdump.hexdump(buf)
+    print(buf)
     print("[-] Exiting.")
     sock.close()
     sys.exit(-1)
+
 
 def connect_socket(addr, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((addr, port))
     return s
+
 
 def sync_read_message(s, fail_reason="Server closed the connection"):
     try:
@@ -27,6 +29,7 @@ def sync_read_message(s, fail_reason="Server closed the connection"):
             sync_bad_packet(b'', s, fail_reason)
     return buf
 
+
 async def bad_packet(reader, writer, reason='', data=b'', cleanup_func=None):
     try:
         raddr, rport = writer.get_extra_info('socket').getpeername()
@@ -38,15 +41,16 @@ async def bad_packet(reader, writer, reason='', data=b'', cleanup_func=None):
 
     if reason != '':
         print(f"[-] {raddr}:{rport} >>> {reason}:\n")
-        hexdump.hexdump(data)
+        print(data)
         print('')
 
     if cleanup_func:
-        await cleanup_func((reader,writer))
+        await cleanup_func((reader, writer))
 
     writer.close()
     await writer.wait_closed()
     print(f"[i] {raddr}:{rport} xxx Connection closed")
+
 
 async def read_message(reader, writer, cleanup_func=None):
     if writer.is_closing():
@@ -72,6 +76,7 @@ async def read_message(reader, writer, cleanup_func=None):
 
         buf = b''
     return buf
+
 
 async def handle_client(reader, writer, handle_message, cleanup_func=None):
     raddr, rport = writer.get_extra_info('socket').getpeername()

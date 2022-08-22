@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import argparse
-import hexdump
 import socket
 import struct
 import sys
@@ -20,6 +19,7 @@ DATA_TYPE = 1337
 DATA_CONT = b"deadbeef"
 DATA_TTL = 4
 
+
 def send_gossip_announce(s):
     """
     Send a GOSSIP_ANNOUNCE message to socket s
@@ -33,11 +33,11 @@ def send_gossip_announce(s):
     buf += DATA_CONT
 
     print(f"[+] Prepared GOSSIP_ANNOUNCE packet:")
-    hexdump.hexdump(buf)
 
     # Send payload
     s.send(buf)
     print(f"[+] Sent GOSSIP_ANNOUNCE ({DATA_TYPE}, {DATA_CONT})")
+
 
 def send_gossip_notify(s):
     """
@@ -51,6 +51,7 @@ def send_gossip_notify(s):
     # Send payload
     s.send(buf)
     print(f"[+] Sent GOSSIP_NOTIFY for type {DATA_TYPE}).")
+
 
 def wait_notification(s):
     """
@@ -68,11 +69,10 @@ def wait_notification(s):
         reason = f"Wrong packet type: {mtype}"
         sync_bad_packet(buf, s, reason)
 
-    print(f"[+] Got GOSSIP_NOTIFICATION: mID = {mid}, type = {dtype}, "
-           + f"data = {mdata}")
+    print(f"[+] Got GOSSIP_NOTIFICATION: mID = {mid}, type = {dtype}, data = {mdata}")
 
-    hexdump.hexdump(buf)
     return mid
+
 
 def send_gossip_validation(s, mid, valid=True):
     """
@@ -91,8 +91,8 @@ def send_gossip_validation(s, mid, valid=True):
     validstr = "Valid" if valid else "Invalid"
     print(f"[+] Sent GOSSIP_VALIDATION: mid = {mid}, {validstr}).")
 
-def main():
 
+def main():
     # allow modification of global default values
     global GOSSIP_ADDR, GOSSIP_PORT
 
@@ -135,7 +135,7 @@ def main():
     else:
         send_gossip_notify(s)
 
-        while(True):
+        while (True):
             try:
                 print("[+] Waiting for GOSSIP_NOTIFICATION message...")
                 mid = wait_notification(s)
@@ -145,6 +145,7 @@ def main():
             send_gossip_validation(s, mid, valid=True)
 
     s.close()
+
 
 if __name__ == "__main__":
     main()

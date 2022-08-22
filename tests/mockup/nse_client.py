@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import argparse
-import hexdump
 import socket
 import struct
 import sys
@@ -14,11 +13,13 @@ NSE_PORT = 7201
 NSE_QUERY = 520
 NSE_ESTIMATE = 521
 
+
 def send_nse_query(sock):
     msize = 4
     buf = struct.pack(">HH", msize, NSE_QUERY)
     sock.send(buf)
     print("[+] Sent NSE QUERY...")
+
 
 def main():
     host = NSE_ADDR
@@ -58,6 +59,10 @@ def main():
 
         print(f"[+] Received NSE_ESTIMATE({peers}, {dev})")
 
+        print("sleeping")
+        import time
+        time.sleep(50)
+
         if not args.cont:
             break
 
@@ -68,6 +73,7 @@ def main():
             break
 
     sock.close()
+
 
 if __name__ == "__main__":
     main()

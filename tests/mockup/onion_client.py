@@ -1,12 +1,10 @@
 #!/usr/bin/python3
 
 import argparse
-import hexdump
 import socket
 import struct
 
 from Crypto.PublicKey import RSA
-from rsa import PublicKey
 
 from util import sync_bad_packet, connect_socket, sync_read_message
 
@@ -15,8 +13,8 @@ ONION_TUNNEL_READY = 561
 ONION_TUNNEL_INCOMING = 562
 ONION_TUNNEL_DESTROY = 563
 ONION_TUNNEL_DATA = 564
-ONION_ERROR= 565
-ONION_COVER= 566
+ONION_ERROR = 565
+ONION_COVER = 566
 
 ONION_ADDR = "127.0.0.1"
 ONION_PORT = 7301
@@ -26,15 +24,12 @@ DEST_PORT = 6304
 DEST_KEY = "dest.pub"
 DEST_DATA = b'foobar'
 
+
 def read_pem_to_der(path):
     f = open(path, 'r')
     key = RSA.importKey(f.read())
     return key.exportKey('DER')
 
-def alternative_read_pem_to_der(path):
-    f = open(path, 'r')
-    key = PublicKey.load_pkcs1(f.read(), 'PEM')
-    return key.save_pkcs1('DER')
 
 def send_onion_build(sock, addr, port, keybuf):
     # construct payload
@@ -44,7 +39,6 @@ def send_onion_build(sock, addr, port, keybuf):
     buf += keybuf
 
     print("[i] Key in DER form:\n")
-    hexdump.hexdump(keybuf)
     print('')
 
     # Send payload
@@ -61,8 +55,8 @@ def send_onion_build(sock, addr, port, keybuf):
         sync_bad_packet(buf, sock, reason)
 
     print(f"[+] Got ONION_TUNNEL_READY:\n\tSize: {msize}\n\tTID: {mtid}\n\tKey:")
-    hexdump.hexdump(mder)
     return mtid
+
 
 def send_onion_data(sock, tid, data):
     # build payload
@@ -71,6 +65,7 @@ def send_onion_data(sock, tid, data):
     buf += data
     print(f"[+] Sending ONION_DATA packet...")
     sock.send(buf)
+
 
 def send_onion_cover(sock, covlen):
     # prepare payload
@@ -86,16 +81,17 @@ def send_onion_cover(sock, covlen):
     mdata = buf[8:]
 
     if mtype is not ONION_TUNNEL_DATA:
-        sync_bad_packet(buf, s, "Wrong packet type")
+        sync_bad_packet(buf, sock, "Wrong packet type")
 
     print(f"[+] Got ONION_TUNNEL_DATA:\n\tSize: {msize}\n\tTID: {mtid}\n\tData:")
-    hexdump.hexdump(mdata)
+
 
 def send_onion_destroy(sock, tid):
     msize = 8
     buf = struct.pack(">HHI", msize, ONION_TUNNEL_DESTROY, tid)
     sock.send(buf)
     print(f"[+] Sent ONION TUNNEL DESTROY for tid {tid}...")
+
 
 def main():
     host = ONION_ADDR
@@ -125,7 +121,7 @@ def main():
                      help="Send ONION DATA message with this data")
     cmd.add_argument("-i", "--tunnelid",
                      help="Set tunnel ID for standalone ONION DATA"
-                          +" / DESTROY messages")
+                          + " / DESTROY messages")
     cmd.add_argument("-c", "--cover",
                      help="Send ONION COVER message of the given length")
     cmd.add_argument("-y", "--destroy", action='store_true',
@@ -173,7 +169,7 @@ def main():
 
             if args.build is not None:
                 key = read_pem_to_der(peer_key)
-                #key = alternative_read_pem_to_der(peer_key)
+                # key = alternative_read_pem_to_der(peer_key)
                 tmpid = send_onion_build(sock, peer_addr, peer_port, key)
 
             if args.data is not None:
@@ -194,8 +190,10 @@ def main():
                   + " iteration of requests")
     except KeyboardInterrupt:
         pass
-    sock.close()
+    else:
+        sock.close()
     print("[i] Connection closed")
+
 
 if __name__ == "__main__":
     main()

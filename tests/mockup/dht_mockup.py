@@ -2,7 +2,6 @@
 
 import argparse
 import asyncio
-import hexdump
 import socket
 import struct
 
@@ -19,6 +18,7 @@ DHT_FAILURE = 653
 storage = {}
 storage_lock = None
 
+
 async def get_from_storage(key):
     global storage, storage_lock
     async with storage_lock:
@@ -28,14 +28,16 @@ async def get_from_storage(key):
         except KeyError:
             return None
 
+
 async def save_to_storage(key, val):
     global storage, storage_lock
     async with storage_lock:
         storage[key] = val
 
+
 async def send_dht_success(reader, writer, key, val):
     raddr, rport = writer.get_extra_info('socket').getpeername()
-    msize = int(4 + (256/8) + len(val))
+    msize = int(4 + (256 / 8) + len(val))
     buf = struct.pack(">HH", msize, DHT_SUCCESS)
     buf += key
     buf += val
@@ -52,9 +54,10 @@ async def send_dht_success(reader, writer, key, val):
 
     return True
 
+
 async def send_dht_failure(reader, writer, key):
     raddr, rport = writer.get_extra_info('socket').getpeername()
-    msize = 4 + (256/8)
+    msize = 4 + (256 / 8)
     buf = struct.pack(">HH", int(msize), DHT_FAILURE)
     buf += key
 
@@ -70,6 +73,7 @@ async def send_dht_failure(reader, writer, key):
 
     return True
 
+
 async def handle_dht_put(buf, reader, writer):
     raddr, rport = writer.get_extra_info('socket').getpeername()
     header = buf[:4]
@@ -78,19 +82,20 @@ async def handle_dht_put(buf, reader, writer):
     msize = struct.unpack(">HH", header)[0]
     ttl, rep, res = struct.unpack(">HBB", buf[4:8])
 
-    if msize <= 8 + (256/8) or len(buf) <= 8 + (256/8):
+    if msize <= 8 + (256 / 8) or len(buf) <= 8 + (256 / 8):
         await bad_packet(reader, writer,
                          f"DHT_PUT with empty value received",
                          buf)
         return False
 
-    key = buf[8: int((256/8)+8)]
-    val = buf[int(8 + (256/8)):]
+    key = buf[8: int((256 / 8) + 8)]
+    val = buf[int(8 + (256 / 8)):]
 
     print(f"[+] {raddr}:{rport} >>> DHT_PUT: ({key}:{val})")
 
     await save_to_storage(key, val)
     return True
+
 
 async def handle_dht_get(buf, reader, writer):
     raddr, rport = writer.get_extra_info('socket').getpeername()
@@ -98,7 +103,7 @@ async def handle_dht_get(buf, reader, writer):
     body = buf[4:]
     msize = struct.unpack(">HH", header)[0]
 
-    if msize != (4 + (256/8)):
+    if msize != (4 + (256 / 8)):
         await bad_packet(reader, writer,
                          f"DHT_GET with incorrect size received",
                          buf)
@@ -115,6 +120,7 @@ async def handle_dht_get(buf, reader, writer):
         ret = await send_dht_failure(reader, writer, key)
 
     return ret
+
 
 async def handle_message(buf, reader, writer):
     ret = False
@@ -133,13 +139,14 @@ async def handle_message(buf, reader, writer):
 
     return ret
 
+
 def main():
     host = DHT_ADDR
     port = DHT_PORT
 
     # parse commandline arguments
     usage_string = ("Run a DHT module mockup with local storage.\n\n"
-                   + "Multiple API clients can connect to this same instance.")
+                    + "Multiple API clients can connect to this same instance.")
     cmd = argparse.ArgumentParser(description=usage_string)
     cmd.add_argument("-a", "--address",
                      help="Bind server to this address")
@@ -175,6 +182,7 @@ def main():
     except KeyboardInterrupt as e:
         print("[i] Received SIGINT, shutting down...")
         loop.stop()
+
 
 if __name__ == '__main__':
     main()
