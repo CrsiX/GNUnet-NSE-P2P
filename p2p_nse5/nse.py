@@ -144,3 +144,60 @@ def get_size_estimate(expected_max_proximity: int) -> float:
     """
 
     return 2 ** (expected_max_proximity - 0.332747)
+
+
+def get_current_round(freq: Union[int, config.Configuration], timestamp: Union[None, int, float] = None) -> int:
+    """
+    Calculate current round identifier based on a frequency (or config) and the timestamp
+
+    :param freq: either a frequency (integer as seconds) or the configuration
+    :param timestamp: optional timestamp to use (otherwise, use the current UNIX timestamp)
+    :return: current round identifier
+    """
+
+    if isinstance(freq, config.Configuration):
+        freq = freq.nse.frequency
+    elif isinstance(freq, config.NSEConfiguration):
+        freq = freq.frequency
+    if timestamp is None:
+        timestamp = time.time()
+    timestamp = int(timestamp)
+    return timestamp // freq
+
+
+def get_start_time(freq: Union[int, config.Configuration], timestamp: Union[None, int, float] = None) -> int:
+    """
+    Calculate the current round's start time based on a frequency (or config) and the timestamp
+
+    :param freq: either a frequency (integer as seconds) or the configuration
+    :param timestamp: optional timestamp to use (otherwise, use the current UNIX timestamp)
+    :return: exact UNIX timestamp when the current round has begun
+    """
+
+    if isinstance(freq, config.Configuration):
+        freq = freq.nse.frequency
+    elif isinstance(freq, config.NSEConfiguration):
+        freq = freq.frequency
+    if timestamp is None:
+        timestamp = time.time()
+    timestamp = int(timestamp)
+    return timestamp - (timestamp % freq)
+
+
+def get_remaining_time(freq: Union[int, config.Configuration], timestamp: Union[None, int, float] = None) -> int:
+    """
+    Calculate the remaining time in the current round based on a frequency (or config) and the timestamp
+
+    :param freq: either a frequency (integer as seconds) or the configuration
+    :param timestamp: optional timestamp to use (otherwise, use the current UNIX timestamp)
+    :return: roughly remaining time of the current round in seconds
+    """
+
+    if isinstance(freq, config.Configuration):
+        freq = freq.nse.frequency
+    elif isinstance(freq, config.NSEConfiguration):
+        freq = freq.frequency
+    if timestamp is None:
+        timestamp = time.time()
+    timestamp = int(timestamp)
+    return max(freq - timestamp % freq - 1, 0)
