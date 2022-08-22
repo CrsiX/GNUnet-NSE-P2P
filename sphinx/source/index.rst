@@ -23,7 +23,7 @@ Table of contents
 
     installation
     configuration
-    codebase
+    codebase/index
     license
 
 Indices and tables
