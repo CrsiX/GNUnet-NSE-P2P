@@ -4,7 +4,7 @@ import socket
 import asyncio
 import logging
 import ipaddress
-from typing import Callable, ClassVar, Optional
+from typing import Callable, ClassVar, Optional, Union
 
 import sqlalchemy.orm
 
@@ -85,7 +85,8 @@ class RoundHandler:
         self._conf = conf
         self._write = write
         self._current_round = int(time.time()) // self._conf.nse.frequency
-        self._own_proximity = p2p.calculate_proximity(self._conf.private_key, self._current_round)
+        self._start_time = get_start_time(self._conf)
+        self._own_proximity = p2p.calculate_proximity(self._conf.private_key, self._start_time)
         self.logger: logging.Logger = logging.getLogger(f"nse.round.{self._current_round}")
 
     async def run(self) -> None:
@@ -105,13 +106,9 @@ class RoundHandler:
         # Get the previous estimate either from the database or use 1 for the first round
         previous_estimate = 1.0
         with persistence.get_new_session() as session:
-            rounds = list(sorted(
-                session.query(persistence.Round).filter_by(round=self._current_round-1).all(),
-                key=lambda o: int(o.proximity),
-                reverse=True
-            ))
+            rounds = utils.get_rounds(session, self._current_round-1)
             if len(rounds) > 0:
-                previous_estimate = calc_size_estimate(rounds[0].proximity)
+                previous_estimate = get_size_estimate(rounds[0].proximity)
             # TODO: Optional improvement: store the past estimates in the database,
             #  then this lookup doesn't only depend on the very last round (use a new table!)
 
@@ -121,18 +118,24 @@ class RoundHandler:
 
         # TODO: Lookup whether some better proximity for the current round appeared while waiting, then return
 
-        msg = p2p.build_message(self._conf.private_key, self._current_round, self.logger, self._own_proximity)
+        msg = p2p.build_message(
+            self._conf.private_key,
+            self._start_time,
+            logger=self.logger,
+            proximity=self._own_proximity,
+            proof_of_work_bits=self._conf.nse.proof_of_work_bits
+        )
         success = self._write(msg)
         self.logger.debug(f"Announce {['failed', 'succeeded'][success]}! Message: {msg}")
         if not success:
-            self.logger.warning("Failed to sent a gossip announcement successfully!")
+            self.logger.warning("Failed to sent a gossip announcement!")
 
     @staticmethod
     def get_delay(frequency: int, proximity: int, previous_estimate: float) -> float:
         return frequency / 2 - (frequency / math.pi * math.atan(proximity - previous_estimate))
 
 
-def calc_size_estimate(expected_max_proximity: int) -> float:
+def get_size_estimate(expected_max_proximity: int) -> float:
     """
     Calculate a rough estimate of the current network size
 

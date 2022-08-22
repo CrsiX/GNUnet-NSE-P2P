@@ -23,6 +23,8 @@ def main() -> int:
             parser.print_usage(sys.stderr)
             raise
 
+        if args.listen:
+            conf.nse.api_address = args.listen
         entrypoint.start(conf)
 
     elif args.command == "validate":

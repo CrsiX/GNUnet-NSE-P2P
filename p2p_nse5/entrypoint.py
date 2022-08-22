@@ -21,7 +21,7 @@ class Manager:
         family, host, port = utils.split_ip_address_and_port(self._conf.gossip.api_address)
         try:
             self.gossip_transport, self._gossip_protocol = await loop.create_connection(
-                lambda: gossip.Protocol(self._conf.nse.data_type, self.reconnect_client), host, port, family=family
+                lambda: gossip.Protocol(self._conf, self.reconnect_client), host, port, family=family
             )
 
         except Exception as exc:
@@ -29,12 +29,12 @@ class Manager:
                 if self.gossip_transport is None:
                     self._logger.critical(f"Failed to create a connection to gossip on {host} port {port}: {exc}")
                 raise
-            if self.gossip_transport.is_closing():
+            if self.gossip_transport and self.gossip_transport.is_closing():
                 self.gossip_transport = None
             self._logger.warning(f"Failed to connect to gossip: {exc}")
             delay = 1.5 ** self._gossip_fails
             self._gossip_fails += 1
-            self._logger.debug(f"Sleeping for {delay:.2f} seconds before the next re-connect attempt ...", delay)
+            self._logger.debug(f"Sleeping for {delay:.2f} seconds before the next re-connect attempt ...")
             await asyncio.sleep(delay)
             loop.create_task(self._start_gossip_client(loop))
             return False

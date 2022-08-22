@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Callable, ClassVar, Optional
 
-from . import utils
+from . import config, persistence, utils
 from .protocols import api, msg_types, p2p
 
 
@@ -13,8 +13,8 @@ class Protocol(asyncio.Protocol):
 
     _instance_counter: ClassVar = utils.counter()
 
-    def __init__(self, data_type: int, reconnect: Optional[Callable[[], None]] = None):
-        self._data_type: int = data_type
+    def __init__(self, conf: config.Configuration, reconnect: Optional[Callable[[], None]] = None):
+        self._conf: config.Configuration = conf
         self._ident: int = next(type(self)._instance_counter)
         self._reconnect: Optional[Callable[[], None]] = reconnect
         self.logger: logging.Logger = logging.getLogger(f"gossip.client.{self._ident}")
@@ -26,14 +26,14 @@ class Protocol(asyncio.Protocol):
             "Successfully established gossip connection to %s port %d",
             *transport.get_extra_info("peername")[:2]
         )
-        data = api.pack_gossip_notify(self._data_type)
-        self.logger.debug(f"Sending packet to gossip endpoint: {data} (data type: {self._data_type})")
+        data = api.pack_gossip_notify(self._conf.nse.data_type)
+        self.logger.debug(f"Sending packet to gossip endpoint: {data} (data type: {self._conf.nse.data_type})")
         transport.write(data)
 
     def data_received(self, data: bytes) -> None:
         try:
             msg_type, value = api.unpack_incoming_message(data, [msg_types.MessageType.GOSSIP_NOTIFICATION])
-            self.logger.info(f"Incoming API message: {msg_type=!r} {value=!r}")
+            self.logger.debug(f"Incoming API message: {msg_type=!r}")
         except api.InvalidMessage as exc:
             self.logger.warning(f"Invalid API message: {exc}")
             self.logger.debug(f"First {min(len(data), 80)} bytes of incoming ignored/invalid message: {data[:80]}")
