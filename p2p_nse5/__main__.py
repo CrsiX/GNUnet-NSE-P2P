@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 import shutil
 
 from . import config, entrypoint, utils
@@ -17,14 +18,28 @@ def main() -> int:
             return 2
 
         try:
-            conf = config.load_configuration([args.config])
+            conf = config.load([args.config])
         except Exception:
             parser.print_usage(sys.stderr)
             raise
 
+        if args.listen:
+            conf.nse.api_address = args.listen
         entrypoint.start(conf)
 
-    elif args.command == "config":
+    elif args.command == "validate":
+        if not os.path.exists(args.config):
+            parser.error(f"config file {args.config!r} not found, please use command 'config' to create one")
+            return 2
+
+        try:
+            conf = config.load([args.config])
+            print(json.dumps(conf.dict(), indent=4, sort_keys=True))
+        except Exception:
+            parser.print_usage(sys.stderr)
+            raise
+
+    elif args.command == "new":
         if not args.force and os.path.exists(args.config):
             parser.error(f"config file {args.config!r} already exists, force overwriting it with option '-f'")
             return 2

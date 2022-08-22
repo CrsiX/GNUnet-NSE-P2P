@@ -5,11 +5,12 @@ Module with various different utilities
 import socket
 import argparse
 import ipaddress
-from typing import Tuple
+from typing import List, Optional, Tuple
 
 import pydantic
+import sqlalchemy.orm
 
-from . import config
+from . import config, persistence
 
 
 def counter(start: int = 0):
@@ -20,23 +21,38 @@ def counter(start: int = 0):
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
+    def add_conf_option(p: argparse.ArgumentParser) -> argparse.ArgumentParser:
+        p.add_argument(
+            "-c", "--conf",
+            help=f"configuration filename (defaults to {config.DEFAULT_CONFIG_FILE!r})",
+            dest="config",
+            default=config.DEFAULT_CONFIG_FILE,
+            metavar="<file>"
+        )
+        return p
+
     parser = argparse.ArgumentParser(
         prog="p2p_nse5",
         description="API for handling Network Size Estimation (NSE) based on GNUnet NSE algorithm for P2P applications",
         epilog="Licensed under AGPLv3."
     )
-    parser.add_argument(
-        "-c",
-        help=f"configuration filename (defaults to {config.DEFAULT_CONFIG_FILE!r})",
-        dest="config",
-        default=config.DEFAULT_CONFIG_FILE,
-        metavar="<file>"
-    )
-
     commands = parser.add_subparsers(title="commands", dest="command", required=True)
-    commands.add_parser("run")
-    config_parser = commands.add_parser("config")
-    config_parser.add_argument("-f", "--force", action="store_true", help="allow overwriting existing files")
+
+    parser_run = add_conf_option(commands.add_parser("run", help="execute the program running the NSE module"))
+    parser_run.add_argument("-l", "--listen", help="overwrite local API listen address")
+
+    parser_new = add_conf_option(commands.add_parser(
+        "new",
+        help="create a new configuration file (for a new program instance)"
+    ))
+    parser_new.add_argument("-f", "--force", action="store_true", help="allow overwriting existing files")
+
+    add_conf_option(commands.add_parser(
+        "validate",
+        help="validate the configuration file by showing the parsed values incl. defaults "
+             "but excluding all irrelevant options (possibly from other modules)"
+    ))
+
     return parser
 
 
@@ -73,3 +89,16 @@ def split_ip_address_and_port(value: str, require_localhost: bool = False) -> Tu
         if require_localhost and not ipaddress.IPv4Address(ip).is_loopback:
             raise ValueError(f"IPv4 {ip} is no address of localhost")
         return socket.AF_INET, ip, port
+
+
+def get_rounds(
+        session: sqlalchemy.orm.Session,
+        round_id: int,
+        backlog: Optional[bool] = None
+) -> List[persistence.Round]:
+    # TODO: Docstring
+    if backlog is None:
+        rs = session.query(persistence.Round).filter_by(round=round_id).all()
+    else:
+        rs = session.query(persistence.Round).filter_by(round=round_id, backlog=backlog).all()
+    return list(sorted(rs, key=lambda o: int(o.proximity), reverse=True))

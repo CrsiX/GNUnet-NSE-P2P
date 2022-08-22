@@ -6,11 +6,25 @@
 Documentation for P2P Network Size Estimation
 =============================================
 
+.. TODO: Write short summary of the project
+
+Most important libraries used in this project:
+
+  * `PyCryptodome <https://www.pycryptodome.org/>`_ for handling RSA keys and their functionality
+  * `Pydantic <https://pydantic-docs.helpmanual.io>`_ for some convenience
+    features while parsing and handling the configuration
+  * `SQLAlchemy <https://sqlalchemy.org>`_ as SQL database ORM for SQLite or MySQL/MariaDB
+
+Table of contents
+-----------------
+
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
 
-
+    installation
+    configuration
+    codebase/index
+    license
 
 Indices and tables
 ==================

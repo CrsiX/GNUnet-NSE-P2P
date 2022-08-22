@@ -3,10 +3,11 @@ Configuration parser module
 """
 
 import os
-import random
 import configparser
+from typing import Any
 
 import pydantic
+import Crypto.PublicKey.RSA
 
 from . import persistence, utils
 from .protocols import p2p
@@ -30,6 +31,7 @@ class GossipConfiguration(pydantic.BaseModel):
 class NSEConfiguration(pydantic.BaseModel):
     api_address: str
     data_type: int = 31337
+    data_gossip_ttl: int = 64
     enforce_localhost: bool = True
 
     log_file: str = "-"  # also supports stdout and stderr
@@ -40,6 +42,10 @@ class NSEConfiguration(pydantic.BaseModel):
 
     database: str = persistence.DEFAULT_DATABASE_URL
 
+    frequency: int = 1800  # in seconds
+    respected_rounds: int = 8  # number of rounds to use in the calculation of the approx. net size
+    max_backlog_rounds: int = 2  # max number of rounds we accept future packets for
+    max_burst_delay: int = 5000  # in milliseconds
     proof_of_work_bits: int = p2p.DEFAULT_PROOF_OF_WORK_BITS
 
     @pydantic.validator("api_address")
@@ -55,12 +61,32 @@ class NSEConfiguration(pydantic.BaseModel):
 
 
 class Configuration(pydantic.BaseModel):
-    host_key_file: str
+    hostkey: str  # noqa
     gossip: GossipConfiguration
     nse: NSEConfiguration
+    _host_key: Crypto.PublicKey.RSA.RsaKey = None
+
+    def __init__(self, **data: Any) -> None:
+        super().__init__(**data)
+        with open(self.hostkey, "r") as f:
+            content = f.read()
+        # Note that the unencrypted RSA private key is kept in memory here!
+        self._host_key = Crypto.PublicKey.RSA.import_key(content)
+
+    @property
+    def private_key(self) -> Crypto.PublicKey.RSA.RsaKey:
+        return self._host_key
+
+    @property
+    def public_key(self) -> Crypto.PublicKey.RSA.RsaKey:
+        return self._host_key.public_key()
+
+    class Config:
+        arbitrary_types_allowed: bool = True
+        underscore_attrs_are_private: bool = True
 
 
-def load_configuration(filenames: list[str]) -> Configuration:
+def load(filenames: list[str]) -> Configuration:
     """
     Load a :class:`Configuration` object from a list of INI-style config files
 

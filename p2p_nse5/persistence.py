@@ -8,7 +8,7 @@ import logging
 import datetime
 from typing import Optional
 
-from sqlalchemy import create_engine, Column, DateTime, ForeignKey, func, Integer, LargeBinary
+from sqlalchemy import Boolean, create_engine, Column, DateTime, ForeignKey, func, Integer, LargeBinary
 from sqlalchemy.engine import Engine as _Engine
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker, Session
 
@@ -29,9 +29,9 @@ class Peer(Base):
 
     id: int = Column(Integer, nullable=False, primary_key=True, autoincrement=True, unique=True)
     public_key: bytes = Column(LargeBinary, nullable=False, unique=True)
-    """RSA 4096 public key of the remote peer in DEM binary format"""
+    """RSA 4096 bit public key of the remote peer in DER binary format"""
     interactions: int = Column(Integer, nullable=False, default=1)
-    """Counter how often our NSE module contacted the peer's NSE module or vice versa"""
+    """Counter how often we received information from the other peer's NSE module"""
     created: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now())
     updated: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
 
@@ -49,6 +49,8 @@ class Round(Base):
     id: int = Column(Integer, nullable=False, primary_key=True, autoincrement=True, unique=True)
     round: int = Column(Integer, nullable=False, unique=True)
     """Round identifier"""
+    backlog: bool = Column(Boolean, nullable=False, unique=False, default=False)
+    """Indicator whether this entry is considered backlog, i.e. hasn't been processed yet (e.g. packet from future)"""
     proximity: int = Column(Integer, nullable=False)
     """Verified proximity measured in matching leading bits of the best peer (see `peer`)"""
     max_hops: int = Column(Integer, nullable=False, default=1)
