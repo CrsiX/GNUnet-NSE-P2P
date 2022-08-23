@@ -55,8 +55,23 @@ class Protocol(asyncio.Protocol):
             self.logger.debug(f"First {min(len(data), 80)} bytes of incoming ignored/invalid message: {data[:80]}")
             return
 
-        # TODO: Do message handling and write an answer using `self.transport.write(bytes)`
-
+        # Do message handling and write an answer using `self.transport.write(bytes)
+        with persistence.get_new_session() as session:
+            rounds = session.query(persistence.Round).order_by(persistence.Round.id.desc()).limit(config.NSEConfiguration.respected_rounds)
+            rounds.pop(0)
+            sum_of_peers = 0
+            variance = 0
+            n = len(rounds)
+            for r in rounds:
+                peers_in_r = int(pow(2, r.proximity - 0.332747))
+                sum_of_peers += peers_in_r
+                variance += int(2 ** (r.proximity - 0.332747) - peers)**2 / n
+            peers = int(sum_of_peers / n)
+            std_deviation = int(variance ** 0.5)
+            
+            answer = api.pack_nse_estimate(peers, std_deviation)
+            self.transport.write(answer)
+        
         if self.transport.can_write_eof():
             self.transport.write_eof()
         self.transport.close()
