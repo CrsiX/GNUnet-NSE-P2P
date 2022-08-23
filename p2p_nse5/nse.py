@@ -57,7 +57,8 @@ class Protocol(asyncio.Protocol):
 
         # Do message handling and write an answer using `self.transport.write(bytes)
         with persistence.get_new_session() as session:
-            rounds = session.query(persistence.Round).order_by(persistence.Round.id.desc()).limit(config.NSEConfiguration.respected_rounds)
+            rounds = session.query(persistence.Round).order_by(persistence.Round.round.desc()) \
+                .limit(config.NSEConfiguration.respected_rounds)
             rounds.pop(0)
             sum_of_peers = 0
             variance = 0
@@ -72,7 +73,7 @@ class Protocol(asyncio.Protocol):
             
             answer = api.pack_nse_estimate(peers, std_deviation)
             self.transport.write(answer)
-        
+
         if self.transport.can_write_eof():
             self.transport.write_eof()
         self.transport.close()
