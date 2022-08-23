@@ -58,7 +58,7 @@ class Protocol(asyncio.Protocol):
         # Do message handling and write an answer using `self.transport.write(bytes)
         with persistence.get_new_session() as session:
             rounds = session.query(persistence.Round).order_by(persistence.Round.round.desc()) \
-                .limit(config.NSEConfiguration.respected_rounds)
+                .limit(config.NSEConfiguration.respected_rounds).all()
             rounds.pop(0)
             sum_of_peers = 0
             variance = 0
