@@ -62,7 +62,7 @@ unittest-3.10-alpine:
   image: python:3.10-alpine
   script:
     - apk update
-    - apk add gcc libc-dev
+    - apk add gcc g++ libc-dev
     - pip install -r requirements.txt
     - python -m tests -v
 
@@ -78,7 +78,7 @@ unittest-3.9-alpine:
   image: python:3.9-alpine
   script:
     - apk update
-    - apk add gcc libc-dev
+    - apk add gcc g++ libc-dev
     - pip install -r requirements.txt
     - python -m tests -v
 
