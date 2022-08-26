@@ -55,9 +55,10 @@ class Protocol(asyncio.Protocol):
             self.transport.write(api.pack_gossip_validation(value.message_id, False))
             return
 
-        # Determining the peer and adding them to our dataset for more efficient storage of rounds
         current_round = int(time.time()) // self._conf.nse.frequency
         with persistence.get_new_session() as session:
+
+            # Determining the peer and adding them to our dataset for more efficient storage of rounds
             peers = session.query(persistence.Peer).filter_by(public_key=der_key).all()
             if len(peers) == 1:
                 peer = peers[0]
@@ -69,47 +70,50 @@ class Protocol(asyncio.Protocol):
                 h = hashlib.sha256(notification.public_key.export_key("PEM")).hexdigest()
                 self.logger.debug(f"New peer {peer.id} created for new public key (hash: {h})")
 
-            # Notifications for the current round are accepted when they have a sufficiently high proximity
-            if r == current_round:
-                rounds = utils.get_rounds(session, current_round)
-                if len(rounds) > 0:
-                    best_round = rounds[0]
+            # Notifications for the current round or any round in the future
+            # (as long as it's not too far ahead) are accepted when they have a
+            # sufficiently high proximity or as the first notification for that round
+            if r == current_round or (r > current_round and r - current_round <= self._conf.nse.max_backlog_rounds):
+                if r > current_round:
+                    self.logger.debug(f"Notification comes from a future round (r={r}, current={current_round})")
+
+                model = session.query(persistence.Round).filter_by(round=current_round).first()
+                if model is not None:
                     # TODO: Should we also answer with an immediate update indicating a higher
                     #  proximity to the specified peer? This is only possible if our NSE module
                     #  had its own P2P connectivity to other peers in the network.
-                    if best_round.proximity >= notification.proximity:
-                        self.logger.debug(f"Too low proximity {notification.proximity} (best: {best_round.proximity})")
+                    if model.proximity >= notification.proximity:
+                        self.logger.debug(f"Too low proximity {notification.proximity} (best: {model.proximity})")
                         self.transport.write(api.pack_gossip_validation(value.message_id, False))
                         return
-                session.add(persistence.Round(
-                    round=current_round,
-                    backlog=False,
-                    proximity=notification.proximity,
-                    max_hops=notification.hop_count,
-                    peer=peer
-                ))
-                session.commit()
-                self.transport.write(api.pack_gossip_validation(value.message_id, True))
 
-            # Notifications with a round in the future are added as 'backlog' and won't be handled now
-            elif r > current_round and r - current_round <= self._conf.nse.max_backlog_rounds:
-                self.logger.debug(f"Notification comes from a future round (r={r}, current={current_round}")
-                session.add(persistence.Round(
-                    round=r,
-                    backlog=True,
+                    model.proximity = notification.proximity
+                    model.max_hops = max(notification.hop_count, model.max_hops)
+                    model.peer = peer
+                    session.add(model)
+                    session.commit()
+                    self.logger.info(f"Updated round {model.round} to proximity {model.proximity} (peer ID: {peer.id})")
+                    self.transport.write(api.pack_gossip_validation(value.message_id, True))
+                    return
+
+                m = persistence.Round(
+                    round=current_round,
                     proximity=notification.proximity,
                     max_hops=notification.hop_count,
                     peer=peer
-                ))
+                )
+                session.add(m)
                 session.commit()
+                self.logger.info(
+                    f"Added new round entry {m.id} for {current_round} with proximity "
+                    f"{m.proximity} and max_hops {m.max_hops} (peer ID: {peer.id})"
+                )
                 self.transport.write(api.pack_gossip_validation(value.message_id, True))
-                return
 
             # Notifications from the past or too far ahead in the future are ignored
             else:
                 self.logger.debug(f"Notification (r={r}) is outdated or too far ahead for now ({current_round})")
                 self.transport.write(api.pack_gossip_validation(value.message_id, False))
-                return
 
     def eof_received(self) -> Optional[bool]:
         self.logger.error("Received EOF from gossip. Trying to re-connect ...")
