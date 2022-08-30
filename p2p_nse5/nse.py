@@ -134,7 +134,7 @@ class RoundHandler:
         self.logger.debug(f"Starting... (round={self._current_round}, proximity={self._own_proximity}, delay={delay})")
         await asyncio.sleep(delay)
 
-        # TODO: Lookup whether some better proximity for the current round appeared while waiting, then returnö
+        # TODO: Lookup whether some better proximity for the current round appeared while waiting, then return
 
         msg = p2p.build_message(
             self._conf.private_key,
