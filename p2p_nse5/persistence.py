@@ -8,7 +8,7 @@ import logging
 import datetime
 from typing import Optional
 
-from sqlalchemy import Boolean, create_engine, Column, DateTime, ForeignKey, func, Integer, LargeBinary
+from sqlalchemy import create_engine, Column, DateTime, ForeignKey, func, Integer, LargeBinary
 from sqlalchemy.engine import Engine as _Engine
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker, Session
 
@@ -49,8 +49,6 @@ class Round(Base):
     id: int = Column(Integer, nullable=False, primary_key=True, autoincrement=True, unique=True)
     round: int = Column(Integer, nullable=False, unique=True)
     """Round identifier"""
-    backlog: bool = Column(Boolean, nullable=False, unique=False, default=False)
-    """Indicator whether this entry is considered backlog, i.e. hasn't been processed yet (e.g. packet from future)"""
     proximity: int = Column(Integer, nullable=False)
     """Verified proximity measured in matching leading bits of the best peer (see `peer`)"""
     max_hops: int = Column(Integer, nullable=False, default=1)
@@ -58,7 +56,7 @@ class Round(Base):
     peer_id: int = Column(Integer, ForeignKey("peers.id"), nullable=False)
     """ID of the peer who sent the time sample to us"""
     peer: Peer = relationship("Peer", backref="rounds")
-    """Relation to the peers, so that the `rounds` of a peer necessarily are the best rounds"""
+    """Relation to the peer, so that the `rounds` of a peer necessarily are the best rounds"""
     created: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now())
     updated: datetime.datetime = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
 
