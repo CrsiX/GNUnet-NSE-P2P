@@ -57,19 +57,18 @@ class Protocol(asyncio.Protocol):
 
         # Do message handling and write an answer using `self.transport.write(bytes)
         with persistence.get_new_session() as session:
-            rounds = session.query(persistence.Round).order_by(persistence.Round.round.desc()) \
-                .limit(config.NSEConfiguration.respected_rounds).all()
-            rounds.pop(0)
+            rounds = session.query(persistence.Round).filter(persistence.Round.round < get_current_round(self.config.nse.frequency)) \
+                .order_by(persistence.Round.round.desc()).limit(config.NSEConfiguration.respected_rounds).all()
             sum_of_peers = 0
             variance = 0
             n = len(rounds)
             for r in rounds:
-                peers_in_r = int(get_size_estimate(r.proximity))
+                peers_in_r = round(get_size_estimate(r.proximity))
                 sum_of_peers += peers_in_r
-            peers = int(sum_of_peers / n)
+            peers = round(sum_of_peers / n)
             for r in rounds:
-                variance += int(get_size_estimate(r.proximity) - peers)**2 / n
-            std_deviation = int(variance ** 0.5)
+                variance += round(get_size_estimate(r.proximity) - peers)**2 / n
+            std_deviation = round(variance ** 0.5)
 
             answer = api.pack_nse_estimate(peers, std_deviation)
             self.transport.write(answer)
@@ -133,7 +132,7 @@ class RoundHandler:
         self.logger.debug(f"Starting... (round={self._current_round}, proximity={self._own_proximity}, delay={delay})")
         await asyncio.sleep(delay)
 
-        # TODO: Lookup whether some better proximity for the current round appeared while waiting, then return
+        # TODO: Lookup whether some better proximity for the current round appeared while waiting, then returnö
 
         msg = p2p.build_message(
             self._conf.private_key,
