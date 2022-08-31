@@ -25,6 +25,8 @@ def main() -> int:
 
         if args.listen:
             conf.nse.api_address = args.listen
+        if args.private_key:
+            conf.hostkey = args.private_key
         entrypoint.start(conf)
 
     elif args.command == "validate":

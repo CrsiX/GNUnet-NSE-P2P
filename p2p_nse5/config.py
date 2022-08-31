@@ -66,20 +66,23 @@ class Configuration(pydantic.BaseModel):
     nse: NSEConfiguration
     _host_key: Crypto.PublicKey.RSA.RsaKey = None
 
-    def __init__(self, **data: Any) -> None:
-        super().__init__(**data)
-        with open(self.hostkey, "r") as f:
-            content = f.read()
-        # Note that the unencrypted RSA private key is kept in memory here!
-        self._host_key = Crypto.PublicKey.RSA.import_key(content)
-
     @property
     def private_key(self) -> Crypto.PublicKey.RSA.RsaKey:
+        if self._host_key is None:
+            self._reload_key()
         return self._host_key
 
     @property
     def public_key(self) -> Crypto.PublicKey.RSA.RsaKey:
+        if self._host_key is None:
+            self._reload_key()
         return self._host_key.public_key()
+
+    def _reload_key(self):
+        with open(self.hostkey, "r") as f:
+            content = f.read()
+        # Note that the unencrypted RSA private key is kept in memory here!
+        self._host_key = Crypto.PublicKey.RSA.import_key(content)
 
     class Config:
         arbitrary_types_allowed: bool = True
