@@ -34,7 +34,7 @@ class Manager:
             self._logger.warning(f"Failed to connect to gossip: {exc}")
             delay = 1.5 ** self._gossip_fails
             self._gossip_fails += 1
-            self._logger.debug(f"Sleeping for {delay:.2f} seconds before the next re-connect attempt ...")
+            self._logger.debug(f"Sleeping for {delay:.2f} seconds before the next auto-reconnect attempt ...")
             await asyncio.sleep(delay)
             loop.create_task(self._start_gossip_client(loop))
             return False

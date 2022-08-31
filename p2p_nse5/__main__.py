@@ -23,6 +23,10 @@ def main() -> int:
             parser.print_usage(sys.stderr)
             raise
 
+        if args.database:
+            conf.nse.database = args.database
+        if args.gossip:
+            conf.gossip.api_address = args.gossip
         if args.listen:
             conf.nse.api_address = args.listen
         if args.private_key:

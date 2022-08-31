@@ -39,8 +39,10 @@ def get_cli_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(title="commands", dest="command", required=True)
 
     parser_run = add_conf_option(commands.add_parser("run", help="execute the program running the NSE module"))
-    parser_run.add_argument("-k", "--private-key", help="overwrite path to the RSA private key file")
+    parser_run.add_argument("-d", "--database", help="overwrite full database connection string")
+    parser_run.add_argument("-g", "--gossip", help="overwrite address of the Gossip API server")
     parser_run.add_argument("-l", "--listen", help="overwrite local API listen address")
+    parser_run.add_argument("-p", "--private-key", help="overwrite path to the RSA private key file")
 
     parser_new = add_conf_option(commands.add_parser(
         "new",
