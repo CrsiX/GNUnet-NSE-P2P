@@ -19,7 +19,7 @@ class GossipEnabledTests(unittest.TestCase):
             self.fail("Unable to find gossip mockup implementation! Adjust cwd or search paths.")
 
         self.gossip_process = subprocess.Popen(
-            [sys.executable, path, "-p", str(self.gossip_port)],
+            [sys.executable, path, "-p", str(self.gossip_port), "-a", "127.0.0.1"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
