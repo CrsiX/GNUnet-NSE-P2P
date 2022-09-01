@@ -43,14 +43,19 @@ def main() -> int:
         if not args.force and os.path.exists(args.config):
             parser.error(f"config file {args.config!r} already exists, force overwriting it with option '-f'")
             return 2
-        shutil.copy(
+        for source in [
+            config.DEFAULT_CONFIG_INI_PATH,
             os.path.abspath(os.path.join(
                 os.path.split(sys.modules["p2p_nse5"].__loader__.path)[0],
                 config.DEFAULT_CONFIG_INI_PATH
-            )),
-            args.config
-        )
-        print(f"A new configuration file has been created as {args.config!r}.")
+            ))
+        ]:
+            if os.path.exists(source):
+                shutil.copy(source, args.config)
+                print(f"A new configuration file has been created as {args.config!r}.")
+                break
+        else:
+            print("ERROR: No default configuration file found. Please get a new copy of this project!", file=sys.stderr)
 
     return 0
 
