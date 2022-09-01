@@ -60,7 +60,7 @@ class Protocol(asyncio.Protocol):
             rounds = session.query(persistence.Round) \
                 .filter(persistence.Round.round < get_current_round(self.config.nse.frequency)) \
                 .order_by(persistence.Round.round.desc()) \
-                .limit(config.NSEConfiguration.respected_rounds).all()
+                .limit(self.config.nse.respected_rounds).all()
             sum_of_peers = 0
             variance = 0
             n = len(rounds)
