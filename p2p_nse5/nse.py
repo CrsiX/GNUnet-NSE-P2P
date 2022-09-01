@@ -55,7 +55,7 @@ class Protocol(asyncio.Protocol):
             self.logger.debug(f"First {min(len(data), 80)} bytes of incoming ignored/invalid message: {data[:80]}")
             return
 
-        # Do message handling and write an answer using `self.transport.write(bytes)
+        # Handle the incoming message and respond with an NSE_ESTIMATE answer
         with persistence.get_new_session() as session:
             rounds = session.query(persistence.Round) \
                 .filter(persistence.Round.round < get_current_round(self.config.nse.frequency)) \
@@ -124,18 +124,28 @@ class RoundHandler:
         # Get the previous estimate either from the database or use 1 for the first round
         previous_estimate = 1.0
         with persistence.get_new_session() as session:
-            rounds = utils.get_rounds(session, self._current_round-1)
+            rounds = session.query(persistence.Round).filter_by(round=self._current_round - 1).all()
             if len(rounds) > 0:
                 previous_estimate = get_size_estimate(rounds[0].proximity)
             # TODO: Optional improvement: store the past estimates in the database,
             #  then this lookup doesn't only depend on the very last round (use a new table!)
 
-        delay = self.get_delay(self._conf.nse.frequency, self._own_proximity, previous_estimate)
+        delay = get_delay(self._conf.nse.frequency, self._own_proximity, previous_estimate)
         self.logger.debug(f"Starting... (round={self._current_round}, proximity={self._own_proximity}, delay={delay})")
         await asyncio.sleep(delay)
 
-        # TODO: Lookup whether some better proximity for the current round appeared while waiting, then return
+        # Return when some equal or better proximity for the current round appeared while waiting
+        with persistence.get_new_session() as session:
+            rounds = session.query(persistence.Round).filter_by(round=self._current_round).all()
+            if len(rounds) > 0:
+                if rounds[0].proximity >= self._own_proximity:
+                    self.logger.debug(
+                        f"Cancelling the broadcast of the current round's estimate, found proximity "
+                        f"{rounds[0].proximity} from peer ID {rounds[0].peer_id}"
+                    )
+                    return
 
+        # Build our own P2P message and hand it over to gossip to spread in the network
         msg = p2p.build_message(
             self._conf.private_key,
             self._start_time,
@@ -148,9 +158,18 @@ class RoundHandler:
         if not success:
             self.logger.warning("Failed to sent a gossip announcement!")
 
-    @staticmethod
-    def get_delay(frequency: int, proximity: int, previous_estimate: float) -> float:
-        return frequency / 2 - (frequency / math.pi * math.atan(proximity - previous_estimate))
+
+def get_delay(frequency: int, proximity: int, previous_estimate: float) -> float:
+    """
+    Calculate the initial delay for starting the flood using the formula by Evans et. al.
+
+    :param frequency: configured network-wide frequency for new size estimate floods
+    :param proximity: calculated own proximity in the current round
+    :param previous_estimate: network size estimate calculated at the end of the previous round
+    :return:
+    """
+
+    return frequency / 2 - (frequency / math.pi * math.atan(proximity - previous_estimate))
 
 
 def get_size_estimate(expected_max_proximity: int) -> float:
