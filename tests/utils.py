@@ -1,8 +1,42 @@
 import os
 import sys
 import random
+import socket
+import struct
 import unittest
 import subprocess
+from typing import Any, Tuple
+
+from p2p_nse5.protocols import api
+
+
+def find_path(paths: list) -> str:
+    """
+    Find a valid existing path of the specified paths or raise a ValueError
+    """
+
+    for path in paths:
+        if os.path.exists(path):
+            return path
+    raise ValueError(f"No file found for search paths {paths!r}")
+
+
+def query_nse(address: Tuple[Any, ...]) -> (int, int):
+    """
+    Query a NSE service using the NSE_ESTIMATE packet and return the result or raise an exception
+    """
+
+    with socket.socket() as s:
+        s.connect(address)
+        s.send(b"\x00\x04\x02\x08")
+        r = s.recv(12)
+        size, t, peers, std_deviation = struct.unpack("!HHII", r)
+        if size != 12:
+            raise ValueError("Invalid message size")
+        if t != api.MessageType.NSE_ESTIMATE:
+            raise ValueError("Invalid message type")
+        s.shutdown(socket.SHUT_RD)
+    return peers, std_deviation
 
 
 class GossipEnabledTests(unittest.TestCase):
