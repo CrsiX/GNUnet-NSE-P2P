@@ -3,16 +3,9 @@ import sys
 import time
 import random
 import string
-import threading
 import subprocess
 
 from . import utils
-
-
-class ConformanceTests(utils.GossipEnabledTests):
-    def test_api_conformance(self):
-        # TODO: Create an API subprocess that runs and will be called by the mockup client
-        pass
 
 
 class CorrectnessTests(utils.GossipEnabledTests):
