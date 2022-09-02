@@ -23,7 +23,7 @@ def counter(start: int = 0):
 def get_cli_parser() -> argparse.ArgumentParser:
     def add_conf_option(p: argparse.ArgumentParser) -> argparse.ArgumentParser:
         p.add_argument(
-            "-c", "--conf",
+            "-c",
             help=f"configuration filename (defaults to {config.DEFAULT_CONFIG_FILE!r})",
             dest="config",
             default=config.DEFAULT_CONFIG_FILE,
@@ -39,10 +39,10 @@ def get_cli_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(title="commands", dest="command", required=True)
 
     parser_run = add_conf_option(commands.add_parser("run", help="execute the program running the NSE module"))
-    parser_run.add_argument("-d", "--database", help="overwrite full database connection string")
-    parser_run.add_argument("-g", "--gossip", help="overwrite address of the Gossip API server")
-    parser_run.add_argument("-l", "--listen", help="overwrite local API listen address")
-    parser_run.add_argument("-p", "--private-key", help="overwrite path to the RSA private key file")
+    parser_run.add_argument("-d", dest="database", metavar="<URL>", help="overwrite full database connection string")
+    parser_run.add_argument("-g", dest="gossip", metavar="<address>", help="overwrite address of the Gossip API server")
+    parser_run.add_argument("-l", dest="listen", metavar="<address>", help="overwrite local API listen address")
+    parser_run.add_argument("-p", dest="private_key", metavar="<file>", help="overwrite path to the RSA private key")
 
     parser_new = add_conf_option(commands.add_parser(
         "new",

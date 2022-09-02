@@ -62,6 +62,7 @@ def main() -> int:
                 break
         else:
             print("ERROR: No default configuration file found. Please get a new copy of this project!", file=sys.stderr)
+            return 1
 
     return 0
 
