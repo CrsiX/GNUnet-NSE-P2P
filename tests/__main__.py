@@ -5,10 +5,10 @@ P2P NSE5 unittest framework
 import unittest
 from typing import Optional
 
-from . import cli, correctness
+from . import cli, correctness, tools
 
 
-TEST_CLASSES = [cli.CLITests, correctness.CorrectnessTests]
+TEST_CLASSES = [cli.CLITests, correctness.CorrectnessTests, tools.ToolTests]
 
 
 class MainProgram(unittest.TestProgram):

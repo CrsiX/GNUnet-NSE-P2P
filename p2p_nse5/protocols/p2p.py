@@ -12,7 +12,7 @@ from Crypto.Hash import SHA512
 
 
 # Protocol structure:
-# 2 bytes    | hop count (updated at each relaying peer)
+# 2 bytes    | hop count (updated at each relaying peer, relevant in P2P mode only)
 # 1 byte     | reserved for future use (currently ignored)
 # 1 byte     | claimed proximity in bits
 # 2 bytes    | length of the RSA public key in bytes (see below)
