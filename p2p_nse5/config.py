@@ -4,7 +4,6 @@ Configuration parser module
 
 import os
 import configparser
-from typing import Any
 
 import pydantic
 import Crypto.PublicKey.RSA
