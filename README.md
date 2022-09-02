@@ -18,10 +18,45 @@
    ```
 5. Create a sample configuration file:
    ```shell
-   python3 -m p2p_nse5 -c <PATH_TO_CONFIG_FILE> config
+   python3 -m p2p_nse5 new -c <PATH_TO_CONFIG_FILE>
    ```
 6. Edit the newly created configuration file to fit your setup.
 7. Run the NSE module:
    ```shell
-   python3 -m p2p_nse5 -c <PATH_TO_CONFIG_FILE> run
+   python3 -m p2p_nse5 run -c <PATH_TO_CONFIG_FILE>
    ```
+
+The `run` command supports a set of runtime options to make it easy to
+run multiple instances with the same configuration file in parallel:
+
+```
+usage: p2p_nse5 run [-h] [-c <file>] [-d <URL>] [-g <address>] [-l <address>] [-p <file>]
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -c <file>     configuration filename (defaults to 'config.ini')
+  -d <URL>      overwrite full database connection string
+  -g <address>  overwrite address of the Gossip API server
+  -l <address>  overwrite local API listen address
+  -p <file>     overwrite path to the RSA private key
+```
+
+## Documentation
+
+Project reports can be found in the directory `docs`.
+
+Source code documentation can be found in the directory `sphinx`. In order to
+generate the HTML version of the source code documentation, use the following:
+
+```shell
+cd sphinx
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install -r ../requirements.txt
+make html
+```
+
+## License
+
+This project is licensed under [AGPLv3](./LICENSE).
