@@ -3,7 +3,8 @@
 import os
 import sys
 import json
-import shutil
+import random
+import string
 
 from . import config, entrypoint, utils
 
@@ -51,7 +52,14 @@ def main() -> int:
             ))
         ]:
             if os.path.exists(source):
-                shutil.copy(source, args.config)
+                with open(source, "r") as f:
+                    content = f.read()
+                content = content.replace(
+                    "database = sqlite:///./nse.db",
+                    f"database = sqlite:///./nse_{''.join(random.choice(string.ascii_lowercase) for _ in '_' * 8)}.db"
+                )
+                with open(args.config, "w") as f:
+                    f.write(content)
                 print(f"A new configuration file has been created as {args.config!r}.")
                 break
         else:

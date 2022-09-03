@@ -45,7 +45,6 @@ class NSEConfiguration(pydantic.BaseModel):
     frequency: int = 1800  # in seconds
     respected_rounds: int = 8  # number of rounds to use in the calculation of the approx. net size
     max_backlog_rounds: int = 2  # max number of rounds we accept future packets for
-    max_burst_delay: int = 5000  # in milliseconds
     proof_of_work_bits: int = p2p.DEFAULT_PROOF_OF_WORK_BITS
 
     @pydantic.validator("api_address")

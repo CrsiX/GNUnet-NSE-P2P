@@ -103,8 +103,9 @@ def start(conf: config.Configuration):
     logging.basicConfig(**log_conf)
 
     logger = logging.getLogger("entrypoint")
-    logger.debug("Starting...")
+    logger.info("Starting...")
 
+    logger.debug(f"Configuring database using {conf.nse.database!r} ...")
     persistence.init(conf.nse.database)
 
     try:
