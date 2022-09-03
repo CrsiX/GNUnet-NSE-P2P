@@ -14,7 +14,7 @@ from .protocols import p2p
 
 DEFAULT_SECTION = "_default"
 GLOBAL_SECTION = "global"
-DEFAULT_CONFIG_FILE = "config.ini"
+DEFAULT_CONFIG_FILE = "default_configuration.ini"
 DEFAULT_CONFIG_INI_PATH = os.path.join(".", "default_configuration.ini")
 
 

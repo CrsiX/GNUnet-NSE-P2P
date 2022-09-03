@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import random
 import socket
 import struct
@@ -8,6 +9,14 @@ import subprocess
 from typing import Any, Tuple
 
 from p2p_nse5.protocols import api
+
+
+def run_dummy_tcp_server(host, port, delay):
+    server = socket.create_server((host, port))
+    s, a = server.accept()
+    time.sleep(delay)
+    s.close()
+    server.close()
 
 
 def find_path(paths: list) -> str:
