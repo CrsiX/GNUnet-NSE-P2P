@@ -8,18 +8,31 @@ import subprocess
 from . import utils
 
 
-class CorrectnessTests(utils.GossipEnabledTests):
-    def setUp(self) -> None:
-        super().setUp()
-        self._running = False
-        c = utils.find_path([
+class NSETests(utils.GossipEnabledTests):
+    @property
+    def config_path(self) -> str:
+        if hasattr(self, "_config_path"):
+            return self._config_path
+        self._config_path = utils.find_path([
             os.path.join(".", "default_configuration.ini"),
             os.path.join("..", "default_configuration.ini"),
             os.path.join("..", "p2p_nse5", "default_configuration.ini")
         ])
+        return self._config_path
+
+    @property
+    def count(self) -> int:
+        if hasattr(self, "_count"):
+            return self._count
+        self._count = random.randint(50, 100)
+        return self._count
+
+    def setUp(self) -> None:
+        super().setUp()
+        self._running = False
+        c = self.config_path
         g = f"127.0.0.1:{self.gossip_port}"
         self.subprocesses = []
-        self.count = 10  # random.randint(50, 100)
 
         for instance in range(self.count):
             key_file = f"private_key{instance:0>2}.pem"
@@ -42,15 +55,6 @@ class CorrectnessTests(utils.GossipEnabledTests):
             self.subprocesses.append((port, path, db, process))
         time.sleep(max(self.count / os.cpu_count(), 1.0))
         self._running = True
-
-    def test_execution(self):
-        for port in [e[0] for e in self.subprocesses]:
-            utils.query_nse(("127.0.0.1", port))
-
-    def test_correctness(self):
-        # TODO: Create a bunch of subprocesses, each with other ports and keys and let them do their job,
-        #  then query them for their size estimates (attention: test probably takes incredibly long!)
-        self._shutdown()
 
     def _shutdown(self, inside: bool = True) -> None:
         def _terminate(process):
@@ -81,3 +85,26 @@ class CorrectnessTests(utils.GossipEnabledTests):
         if self._running:
             self._shutdown(inside=False)
         super().tearDown()
+
+
+class CorrectnessTests(NSETests):
+    def setUp(self) -> None:
+        self._config_path = utils.find_path([
+            os.path.join(".", "tests", "static", "correctness-tests.ini"),
+            os.path.join("tests", "static", "correctness-tests.ini"),
+            os.path.join("..", "tests", "static", "correctness-tests.ini"),
+            os.path.join("static", "correctness-tests.ini"),
+            os.path.join("..", "static", "correctness-tests.ini")
+        ])
+        super().setUp()
+
+    def test_correctness(self):
+        # TODO: Create a bunch of subprocesses, each with other ports and keys and let them do their job,
+        #  then query them for their size estimates (attention: test probably takes incredibly long!)
+        self._shutdown()
+
+
+class ExecutionTests(NSETests):
+    def test_execution(self):
+        for port in [e[0] for e in self.subprocesses]:
+            utils.query_nse(("127.0.0.1", port))

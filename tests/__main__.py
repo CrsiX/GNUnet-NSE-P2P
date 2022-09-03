@@ -8,7 +8,7 @@ from typing import Optional
 from . import cli, correctness, tools
 
 
-TEST_CLASSES = [cli.CLITests, correctness.CorrectnessTests, tools.ToolTests]
+TEST_CLASSES = [cli.CLITests, correctness.CorrectnessTests, correctness.ExecutionTests, tools.ToolTests]
 
 
 class MainProgram(unittest.TestProgram):
