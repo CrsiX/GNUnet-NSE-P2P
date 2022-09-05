@@ -6,6 +6,8 @@ import json
 import shutil
 import argparse
 
+import Crypto.PublicKey.RSA
+
 from . import config, entrypoint, utils
 
 
@@ -66,6 +68,19 @@ def _new(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
         return 1
 
 
+def _generate(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
+    if not args.force and os.path.exists(args.path):
+        parser.error(f"file {args.path!r} already exists, force overwriting it with option '-f'")
+        return 2
+
+    print("Generating RSA 4096-bit key, this may take some time... ", end="", flush=True)
+    private_key = Crypto.PublicKey.RSA.generate(4096).export_key("PEM")
+    with open(args.path, "wb") as f:
+        f.write(private_key)
+    print("Done!")
+    return 0
+
+
 def main() -> int:
     parser = utils.get_cli_parser()
     args = parser.parse_args()
@@ -73,7 +88,8 @@ def main() -> int:
     return {
         "run": _run,
         "validate": _validate,
-        "new": _new
+        "new": _new,
+        "generate": _generate
     }[args.command](parser, args)
 
 

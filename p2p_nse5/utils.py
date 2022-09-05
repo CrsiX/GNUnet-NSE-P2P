@@ -44,6 +44,10 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser_run.add_argument("-l", dest="listen", metavar="<address>", help="overwrite local API listen address")
     parser_run.add_argument("-p", dest="private_key", metavar="<file>", help="overwrite path to the RSA private key")
 
+    parser_generate = commands.add_parser("generate", help="generate a new 4096 bit RSA private key in PEM format")
+    parser_generate.add_argument("path", help="target filename where to store the new RSA private key")
+    parser_generate.add_argument("-f", "--force", action="store_true", help="allow overwriting existing files")
+
     parser_new = add_conf_option(commands.add_parser(
         "new",
         help="create a new configuration file (for a new program instance)"

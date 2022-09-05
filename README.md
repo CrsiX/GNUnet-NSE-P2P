@@ -21,6 +21,11 @@
    python3 -m p2p_nse5 new -c <PATH_TO_CONFIG_FILE>
    ```
 6. Edit the newly created configuration file to fit your setup.
+   In case the required RSA private key has not yet been generated,
+   this can be accomplished using the subcommand `generate`:
+   ```shell
+   python3 -m p2p_nse5 generate <PATH_TO_NEW_RSA_FILE>
+   ```
 7. Run the NSE module:
    ```shell
    python3 -m p2p_nse5 run -c <PATH_TO_CONFIG_FILE>
