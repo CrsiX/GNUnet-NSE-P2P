@@ -68,12 +68,15 @@ class Protocol(asyncio.Protocol):
             for r in rounds:
                 peers_in_r = round(get_size_estimate(r.proximity))
                 sum_of_peers += peers_in_r
-            peers = round(sum_of_peers / n)
-            for r in rounds:
-                variance += round(get_size_estimate(r.proximity) - peers)**2 / n
-            std_deviation = round(variance ** 0.5)
+            if n > 0:
+                peers = round(sum_of_peers / n)
+                for r in rounds:
+                    variance += round(get_size_estimate(r.proximity) - peers)**2 / n
+                std_deviation = round(variance ** 0.5)
 
-            answer = api.pack_nse_estimate(peers, std_deviation)
+                answer = api.pack_nse_estimate(peers, std_deviation)
+            else:
+                answer = api.pack_nse_estimate(0, 0)
             self.transport.write(answer)
 
         if self.transport.can_write_eof():
