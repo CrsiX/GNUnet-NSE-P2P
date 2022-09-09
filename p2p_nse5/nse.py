@@ -1,5 +1,6 @@
 import math
 import time
+import random
 import socket
 import asyncio
 import logging
@@ -132,7 +133,7 @@ class RoundHandler:
 
         delay = get_delay(self._conf.nse.frequency, self._own_proximity, previous_estimate)
         self.logger.debug(f"Starting... (round={self._current_round}, proximity={self._own_proximity}, delay={delay})")
-        await asyncio.sleep(delay)
+        await asyncio.sleep(delay * (1 + random.random() / 20))
 
         # Return when some equal or better proximity for the current round appeared while waiting
         with persistence.get_new_session() as session:
