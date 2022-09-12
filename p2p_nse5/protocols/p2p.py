@@ -19,18 +19,19 @@ from Crypto.Hash import SHA512
 
 
 # Protocol structure:
+# 1 byte     | version field, reserved for future use (currently ignored)
 # 2 bytes    | hop count (updated at each relaying peer, relevant in P2P mode only)
-# 1 byte     | reserved for future use (currently ignored)
 # 1 byte     | claimed proximity in bits
 # 2 bytes    | length of the RSA public key in bytes (see below)
 # 8 bytes    | time of the round as UNIX timestamp
 # 8 bytes    | random nonce for the proof of work
 # var bytes  | RSA public key in DEM binary format
 # 512 bytes  | 4096-bit RSA signature of everything except the first 2 bytes
-PROTOCOL_HEADER = struct.Struct("!HxBHQQ")
-HASHED_HEADER = struct.Struct("!xBHQQ")
+PROTOCOL_HEADER = struct.Struct("!xHBHQQ")
+HASHED_HEADER = struct.Struct("!BHQQ")
 HEADER_LENGTH = 22
 SIGNATURE_LENGTH = 512
+SIGNATURE_SKIPPED_PREFIX = 3
 
 DEFAULT_PROOF_OF_WORK_BITS = 20
 HASH_ENDIAN = "big"
@@ -190,7 +191,7 @@ def unpack_message(msg: bytes, min_proximity: int = None, proof_of_work_bits: in
     try:
         signature = msg[-SIGNATURE_LENGTH:]
         pub_key = RSA.import_key(msg[HEADER_LENGTH:HEADER_LENGTH + pub_key_len])
-        pss.new(pub_key).verify(SHA512.new(msg[2:-SIGNATURE_LENGTH]), signature)
+        pss.new(pub_key).verify(SHA512.new(msg[SIGNATURE_SKIPPED_PREFIX:-SIGNATURE_LENGTH]), signature)
     except IndexError as exc:
         raise ValueError from exc
     if calculate_proximity(pub_key, round_time) != proximity:
