@@ -7,12 +7,13 @@ from p2p_nse5.protocols import p2p
 
 
 class ToolTests(unittest.TestCase):
-    def test_p2p_message(self):
+    def test_invalid_key(self):
         rsa_key = Crypto.PublicKey.RSA.generate(1024)
         self.assertTrue(rsa_key.has_private())
         with self.assertRaises(ValueError):
             p2p.build_message(rsa_key, 1337)
 
+    def test_p2p_message(self):
         rsa_key = Crypto.PublicKey.RSA.generate(4096)
         with self.assertRaises(ValueError):
             p2p.build_message(rsa_key.public_key(), 1337)
