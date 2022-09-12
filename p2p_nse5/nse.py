@@ -97,24 +97,13 @@ class Protocol(asyncio.Protocol):
         # Handle the incoming message and respond with an NSE_ESTIMATE answer
         with persistence.get_new_session() as session:
             rounds = session.query(persistence.Round) \
-                .filter(persistence.Round.round < get_current_round(self.config.nse.frequency)) \
-                .order_by(persistence.Round.round.desc()) \
+                .filter(persistence.Round.round <= get_current_round(self.config.nse.frequency)) \
                 .limit(self.config.nse.respected_rounds).all()
-            sum_of_peers = 0
-            variance = 0
-            n = len(rounds)
-            for r in rounds:
-                peers_in_r = round(get_size_estimate(r.proximity))
-                sum_of_peers += peers_in_r
-            if n > 0:
-                peers = round(sum_of_peers / n)
-                for r in rounds:
-                    variance += round(get_size_estimate(r.proximity) - peers)**2 / n
-                std_deviation = round(variance ** 0.5)
 
-                answer = api.pack_nse_estimate(peers, std_deviation)
-            else:
-                answer = api.pack_nse_estimate(0, 0)
+            proximity_values = list(map(lambda p: p.proximity, rounds))
+            std_deviation = utils.get_std_deviation(proximity_values)
+            total_peers = round(sum(map(get_size_estimate, proximity_values)))
+            answer = api.pack_nse_estimate(total_peers, std_deviation)
             self.transport.write(answer)
 
         if self.transport.can_write_eof():
