@@ -3,7 +3,8 @@
 import os
 import sys
 import json
-import shutil
+import random
+import string
 import argparse
 
 import Crypto.PublicKey.RSA
@@ -60,7 +61,13 @@ def _new(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
         ))
     ]:
         if os.path.exists(source):
-            shutil.copy(source, args.config)
+            with open(source, "r") as f:
+                content = f.read().replace(
+                    "database = sqlite:///./nse.db",
+                    f"database = sqlite:///./nse_{''.join(random.choice(string.ascii_lowercase) for _ in '_' * 8)}.db"
+                )
+            with open(args.config, "w") as f:
+                f.write(content)
             print(f"A new configuration file has been created as {args.config!r}.")
             break
     else:
