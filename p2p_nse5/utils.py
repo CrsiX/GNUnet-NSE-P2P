@@ -5,7 +5,7 @@ Module with various different utilities
 import socket
 import argparse
 import ipaddress
-from typing import Tuple
+from typing import List, Tuple
 
 import pydantic
 
@@ -102,3 +102,21 @@ def split_ip_address_and_port(value: str, require_localhost: bool = False) -> Tu
         if require_localhost and not ipaddress.IPv4Address(ip).is_loopback:
             raise ValueError(f"IPv4 {ip} is no address of localhost")
         return socket.AF_INET, ip, port
+
+
+def get_std_deviation(values: List[int]) -> int:
+    """
+    Calculate the standard deviation of a set of values
+
+    :param values: list of integers
+    :return: standard deviation
+    """
+
+    variance = 0
+    total = sum(values)
+    if len(values) > 1:
+        average = total / len(values)
+        for v in values:
+            variance += (v - average) ** 2
+        return round((variance / len(values)) ** 0.5)
+    return 0
