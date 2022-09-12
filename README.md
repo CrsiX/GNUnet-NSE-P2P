@@ -1,5 +1,11 @@
 # P2P Summer Semester 2022: Network Size Estimation (5)
 
+This project aims at implementing a Network Size Estimation (NSE) service
+in an unstructured P2P network in the context of a VoIP application.
+It uses the GNUnet NSE algorithm in a slightly changed configuration
+to estimate the number of peers that are actively participating in the P2P
+network. It relies on another module, Gossip, to work properly.
+
 ## Setup and execution
 
 1. Make sure you have Python >= 3.9 and a recent enough version of `pip`

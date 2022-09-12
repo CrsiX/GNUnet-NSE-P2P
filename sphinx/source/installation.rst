@@ -124,7 +124,19 @@ You can now easily start the NSE module and API using the ``run`` command:
 
 .. code-block::
 
-    python3 -m p2p_nse5 run --help
+    $ python3 -m p2p_nse5 run --help
+    usage: p2p_nse5 run [-h] [-c <file>] [-d <URL>] [-g <address>] [-l <address>] [-p <file>]
+
+    optional arguments:
+      -h, --help    show this help message and exit
+      -c <file>     configuration filename (defaults to 'default_configuration.ini')
+      -d <URL>      overwrite full database connection string
+      -g <address>  overwrite address of the Gossip API server
+      -l <address>  overwrite local API listen address
+      -p <file>     overwrite path to the RSA private key
+
+.. code-block::
+
     python3 -m p2p_nse5 run
 
 Systemd service

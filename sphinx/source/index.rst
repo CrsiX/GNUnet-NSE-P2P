@@ -6,6 +6,12 @@
 Documentation for P2P Network Size Estimation
 =============================================
 
+This project aims at implementing a Network Size Estimation (NSE) service
+in an unstructured P2P network in the context of a VoIP application.
+It uses the GNUnet NSE algorithm in a slightly changed configuration
+to estimate the number of peers that are actively participating in the P2P
+network. It relies on another module, Gossip, to work properly.
+
 .. TODO: Write short summary of the project
 
 Most important libraries used in this project:
