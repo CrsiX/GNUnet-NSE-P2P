@@ -131,23 +131,6 @@ class SingleTests(NSETests):
             self.assertEqual((i[1], 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
 
 
-class CorrectnessTests(NSETests):
-    def setUp(self) -> None:
-        self._config_path = utils.find_path([
-            os.path.join(".", "tests", "static", "correctness-tests.ini"),
-            os.path.join("tests", "static", "correctness-tests.ini"),
-            os.path.join("..", "tests", "static", "correctness-tests.ini"),
-            os.path.join("static", "correctness-tests.ini"),
-            os.path.join("..", "static", "correctness-tests.ini")
-        ])
-        super().setUp()
-
-    def test_correctness(self):
-        # TODO: Create a bunch of subprocesses, each with other ports and keys and let them do their job,
-        #  then query them for their size estimates (attention: test probably takes incredibly long!)
-        self._shutdown()
-
-
 class ExecutionTests(NSETests):
     def test_execution(self):
         for port in [e[0] for e in self.subprocesses]:

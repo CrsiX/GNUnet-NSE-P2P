@@ -167,3 +167,9 @@ Issue | Name | Chris | Luis
 16 | Horizontal communication | 0m | 0m
 ||||
 | | Total | 50h 45m | 26h 45m
+
+## Sources
+
+We have based our whole project on the PDF version of the GNUnet NSE
+paper from Nathan Evans, Bartlomiej Polot and Christian Grothoff.
+Source: https://grothoff.org/christian/rrsize2012.pdf
