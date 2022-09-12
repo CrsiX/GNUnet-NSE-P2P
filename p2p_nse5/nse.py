@@ -1,3 +1,7 @@
+"""
+Module handling interactions with other NSE API clients and other NSE peers via Gossip
+"""
+
 import math
 import time
 import random
@@ -16,9 +20,12 @@ from .protocols import api, p2p
 class Protocol(asyncio.Protocol):
     """
     Implementation of the API protocol for the NSE module using the asyncio framework
+
+    :param configuration: package configuration instance for a NSE5 instance
     """
 
     _instance_counter: ClassVar = utils.counter()
+    """Simple counter to give every instance of this class a new increasing number"""
 
     def __init__(self, configuration: config.Configuration):
         self._ident: int = next(type(self)._instance_counter)
@@ -30,6 +37,20 @@ class Protocol(asyncio.Protocol):
         self.session: Optional[sqlalchemy.orm.Session] = None
 
     def connection_made(self, transport: asyncio.Transport) -> None:
+        """
+        Handler to be called when a connection is made
+
+        The transport must be an IPv4 or IPv6 transport, depending on
+        which kind of API listen address has been configured in
+        :class:`p2p_nse5.config.NSEConfiguration`. If
+        :attr:`p2p_nse5.config.NSEConfiguration.enforce_localhost` is set
+        and the remote end is no local interface, the connection
+        will be closed.
+
+        :param transport: transport representing the pipe connection
+        :return: None
+        """
+
         self.transport = transport
         if self.family == socket.AF_INET:
             host, port = transport.get_extra_info("peername", [None, None])
@@ -48,6 +69,23 @@ class Protocol(asyncio.Protocol):
         self.logger.info("Accepted incoming connection from %s port %d", host, port)
 
     def data_received(self, data: bytes) -> None:
+        """
+        Handler to be called when some data is received by the underlying TCP transport
+
+        This method will first attempt to parse the incoming TCP packet as
+        a ``NSE_QUERY`` API message, since no other messages are
+        expected on the protocol's TCP connection anyways. If this
+        fails, the message is silently discarded.
+
+        Then, the database is queried for the most recent rounds
+        known to the peer, to calculate the overall network size
+        estimate and standard deviation. Those values are then
+        returned via the same transport as ``NSE_ESTIMATE`` message.
+
+        :param data: incoming raw message (buffer of bytes from the underlying TCP connection)
+        :return: None
+        """
+
         try:
             api.unpack_incoming_message(data, [api.MessageType.NSE_QUERY])
             self.logger.info("Incoming API message: NSE_QUERY")
@@ -101,6 +139,11 @@ class Protocol(asyncio.Protocol):
 class RoundHandler:
     """
     Handler class for a single iteration (round) of the GNUnet NSE algorithm
+
+    :param conf: package configuration instance for a NSE5 instance
+    :param write: callable accepting some bytes which should be written
+        to the currently active transport to the Gossip API server,
+        so that NSE information can be successfully spread in the network
     """
 
     def __init__(self, conf: config.Configuration, write: Callable[[bytes], bool]):
