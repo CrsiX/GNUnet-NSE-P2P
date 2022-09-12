@@ -85,6 +85,11 @@ The following steps should be executed as your target user (e.g. ``nse`` or ``ns
         supported by `SQLAlchemy <https://docs.sqlalchemy.org/en/14/dialects>`_
         may work. See :ref:`configuration` for more information.
 
+    .. note::
+
+        On Alpine Linux, you need the additional packages ``gcc``, ``g++`` and
+        ``libc-dev``. On Debian GNU/Linux, you may need the ``build-essential`` package.
+
 4.  Choose a configuration filename, e.g. ``config.ini``, and create a new config file:
 
     .. code-block::
@@ -100,6 +105,17 @@ The following steps should be executed as your target user (e.g. ``nse`` or ``ns
       * the API address of the Gossip module
       * the API address of the NSE module
       * the database connection string (if omitted, a temporary SQLite will be used)
+
+    .. note::
+
+        If you don't have a RSA 4096-bit private key yet, you can generate a
+        fresh one with the following command:
+
+        .. code-block::
+
+            python3 -m p2p_nse5 generate <path>
+
+        **Do not re-use any private key previously used in other projects!**
 
 Execution
 ---------

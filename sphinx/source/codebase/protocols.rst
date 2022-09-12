@@ -17,14 +17,6 @@ API
     :undoc-members:
     :private-members:
 
-NSE
----
-
-.. automodule:: p2p_nse5.protocols.nse
-    :members:
-    :undoc-members:
-    :private-members:
-
 P2P
 ---
 

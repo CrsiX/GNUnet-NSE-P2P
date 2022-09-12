@@ -140,7 +140,7 @@ def build_message(
 
 def unpack_message(msg: bytes, min_proximity: int = None, proof_of_work_bits: int = None) -> ProtocolMessage:
     """
-    Unpack an incoming message as raw bytes string into a `ProtocolMessage` instance
+    Unpack an incoming message as raw bytes string into a :class:`ProtocolMessage` instance
 
     :param msg: raw bytes string that has been received as incoming NSE P2P message
     :param min_proximity: minimal proximity; messages with a lower proximity to the

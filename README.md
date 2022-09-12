@@ -16,6 +16,7 @@
    ```shell
    pip3 install -r requirements.txt
    ```
+   On Alpine Linux, you need the extra packages `gcc`, `g++` and `libc-dev`.
 5. Create a sample configuration file:
    ```shell
    python3 -m p2p_nse5 new -c <PATH_TO_CONFIG_FILE>

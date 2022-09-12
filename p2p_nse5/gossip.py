@@ -1,3 +1,7 @@
+"""
+Module handling interactions with the Gossip API server
+"""
+
 import time
 import asyncio
 import hashlib
@@ -11,9 +15,15 @@ from .protocols import api, p2p
 class Protocol(asyncio.Protocol):
     """
     Implementation of the API protocol to/from the gossip module dependency using the asyncio framework
+
+    :param conf: package configuration instance for a NSE5 instance
+    :param reconnect: callable that should trigger a reconnection attempt
+        of the connection to the Gossip API server, which is usually supplied by
+        a manager class, e.g. :class:`p2p_nse5.entrypoint.Manager`
     """
 
     _instance_counter: ClassVar = utils.counter()
+    """Simple counter to give every instance of this class a new increasing number"""
 
     def __init__(self, conf: config.Configuration, reconnect: Optional[Callable[[], None]] = None):
         self._conf: config.Configuration = conf
@@ -33,6 +43,31 @@ class Protocol(asyncio.Protocol):
         transport.write(data)
 
     def data_received(self, data: bytes) -> None:
+        """
+        Handler to be called when some data is received by the underlying TCP transport
+
+        This method will first attempt to parse the incoming TCP packet as
+        a ``GOSSIP_NOTIFICATION`` API message, since no other messages are
+        expected on the Gossip TCP connection anyways. If this fails, the
+        message is silently discarded. Then, the payload of that message will be
+        unpacked as instance of our P2P protocol. If this fails, the message is
+        discarded, and the Gossip server will be notified of an invalid message.
+        In this step, the proof of work is also forcefully verified by
+        :func:`p2p_nse5.protocols.p2p.unpack_message`.
+
+        The remote peer's public key will now be extracted from the validated
+        gossip message. If the peer is already known in the database, the
+        peer ID can be looked up; otherwise, a new peer entry will be created.
+
+        Next, the round is identified. If it's too far in the past or future,
+        the message will be invalidated. Otherwise, if the proximity of the
+        message is sufficiently large (at least one bit higher than any previous
+        proximity for the specified round), it will be accepted.
+
+        :param data: incoming raw message (buffer of bytes from the underlying TCP connection)
+        :return: None
+        """
+
         try:
             msg_type, value = api.unpack_incoming_message(data, [api.MessageType.GOSSIP_NOTIFICATION])
             self.logger.debug(f"Incoming API message: {msg_type=!r}")

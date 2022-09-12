@@ -19,19 +19,39 @@ DEFAULT_CONFIG_INI_PATH = os.path.join(".", "default_configuration.ini")
 
 
 class GossipConfiguration(pydantic.BaseModel):
+    """
+    Gossip configuration
+    """
+
     api_address: str
+    """API address of the Gossip server (usually localhost)"""
 
     @pydantic.validator("api_address")
     def is_valid_address_and_port(value: str):  # noqa
+        """
+        Checks :attr:`api_address` for conformance with :func:`p2p_nse5.utils.split_ip_address_and_port`
+
+        :raise ValueError: if it's not valid
+        """
+
         utils.split_ip_address_and_port(value, True)
         return value
 
 
 class NSEConfiguration(pydantic.BaseModel):
+    """Configuration specific to the NSE module"""
+
     api_address: str
+    """API address the NSE module should be listening on (usually localhost)"""
+
     data_type: int = 31337
+    """Data type used by Gossip to identify the NSE messages"""
+
     data_gossip_ttl: int = 64
+    """TTL used to instruct Gossip how far NSE messages should be spread in the network"""
+
     enforce_localhost: bool = True
+    """Switch to enforce incoming API connections to originate from localhost"""
 
     log_file: str = "-"  # also supports stdout and stderr
     log_level: str = "DEBUG"
@@ -40,19 +60,36 @@ class NSEConfiguration(pydantic.BaseModel):
     log_dateformat: str = "%d.%m.%Y %H:%M:%S"
 
     database: str = persistence.DEFAULT_DATABASE_URL
+    """Connection string to the database used in the project"""
 
-    frequency: int = 1800  # in seconds
-    respected_rounds: int = 8  # number of rounds to use in the calculation of the approx. net size
-    max_backlog_rounds: int = 2  # max number of rounds we accept future packets for
+    frequency: int = 1800
+    """Length of a single NSE round in seconds"""
+    respected_rounds: int = 8
+    """Number of rounds to use in the calculation of the approx. net size"""
+    max_backlog_rounds: int = 2
+    """Max number of rounds we accept future packets for"""
     proof_of_work_bits: int = p2p.DEFAULT_PROOF_OF_WORK_BITS
+    """Number of bits required for the proof of work in P2P messages"""
 
     @pydantic.validator("api_address")
     def is_valid_address_and_port(value: str):  # noqa
+        """
+        Checks :attr:`api_address` for conformance with :func:`p2p_nse5.utils.split_ip_address_and_port`
+
+        :raise ValueError: if it's not valid
+        """
+
         utils.split_ip_address_and_port(value, True)
         return value
 
     @pydantic.validator("data_type")
     def is_valid_data_type_for_gossip_api(value: str):  # noqa
+        """
+        Checks :attr:`data_type` to be in range 1 - 65535
+
+        :raise ValueError: if it's not in that range
+        """
+
         if not 1 <= int(value) < 65536:
             raise ValueError(f"Data type value {value} out of range for uint16")
         return value
@@ -60,18 +97,21 @@ class NSEConfiguration(pydantic.BaseModel):
 
 class Configuration(pydantic.BaseModel):
     hostkey: str  # noqa
+    """Path to the RSA 4096-bit private key in PEM format"""
     gossip: GossipConfiguration
     nse: NSEConfiguration
     _host_key: Crypto.PublicKey.RSA.RsaKey = None
 
     @property
     def private_key(self) -> Crypto.PublicKey.RSA.RsaKey:
+        """:class:`Crypto.PublicKey.RSA.RsaKey` instance of the private key"""
         if self._host_key is None:
             self._reload_key()
         return self._host_key
 
     @property
     def public_key(self) -> Crypto.PublicKey.RSA.RsaKey:
+        """:class:`Crypto.PublicKey.RSA.RsaKey` instance of the public key"""
         if self._host_key is None:
             self._reload_key()
         return self._host_key.public_key()
@@ -92,10 +132,11 @@ def load(filenames: list[str]) -> Configuration:
     Load a :class:`Configuration` object from a list of INI-style config files
 
     In case the configuration file contains top-level entries without prior
-    section, those entries are listed below a global section :var:`GLOBAL_SECTION`.
+    section, those entries are listed below a global section :const:`GLOBAL_SECTION`.
 
     :param filenames: list of filenames to search for
     :return: instance of a :class:`Configuration`
+    :raise RuntimeError: if no configuration file was found in the list of files
     """
 
     def make_conf(c: configparser.ConfigParser) -> Configuration:
