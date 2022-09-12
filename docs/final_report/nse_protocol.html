@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NSE P2P protocol &mdash; P2P Network Size Estimation  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Source Code Documentation" href="codebase/index.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> P2P Network Size Estimation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">NSE P2P protocol</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#structure-of-p2p-messages">Structure of P2P messages</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="codebase/index.html">Source Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">P2P Network Size Estimation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>NSE P2P protocol</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/nse_protocol.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nse-p2p-protocol">
+<span id="nse-protocol"></span><h1>NSE P2P protocol<a class="headerlink" href="#nse-p2p-protocol" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="structure-of-p2p-messages">
+<h2>Structure of P2P messages<a class="headerlink" href="#structure-of-p2p-messages" title="Permalink to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 12%" />
+<col style="width: 74%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>No.</p></th>
+<th class="head"><p>Size</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Hashed</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>1 byte</p></td>
+<td><p>version field, reserved for future use (currently ignored)</p></td>
+<td><p>False</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>2 bytes</p></td>
+<td><p>hop count (updated at each relaying peer, relevant in P2P mode only)</p></td>
+<td><p>False</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>1 byte</p></td>
+<td><p>claimed proximity in bits</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>2 bytes</p></td>
+<td><p>length of the RSA public key in bytes (see below)</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>8 bytes</p></td>
+<td><p>time of the round as UNIX timestamp</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>8 bytes</p></td>
+<td><p>random nonce for the proof of work</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>var bytes</p></td>
+<td><p>RSA public key in DEM binary format</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>512 bytes</p></td>
+<td><p>4096-bit RSA signature of everything except the first 2 bytes</p></td>
+<td><p>False</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <code class="docutils literal notranslate"><span class="pre">Hashed</span></code> column specifies whether the field is part of the proof of work
+challenge. This proof of work is calculated as the SHA256 hash of the
+concatenation of all those five fields. If that hash has it’s first <cite>x</cite> bits
+set to zero, the proof of work is valid (where <cite>x</cite> is a natural number between
+0 and 255).</p>
+<p>In the original <a class="reference external" href="https://grothoff.org/christian/rrsize2012.pdf">GNUnet NSE specification</a>,
+the proof of work hash was solely calculated using the peer’s identity (the public
+key). This makes pre-computing hash collisions easier. Therefore, we’re hashing the
+previously mentioned five fields to eliminate the possibility to effectively
+pre-calculate large amounts of those hashes, since they change for every round.</p>
+<p>Note that we’re not using string representations for the “key” the proximity is
+calculated against. The paper used formatted times, e.g. <code class="docutils literal notranslate"><span class="pre">DD-MM-YYYY</span> <span class="pre">HH:00:00</span></code>.
+We’re just using the start of a round as UNIX timestamp, since it gets hashed
+with SHA256 anyways and using the string doesn’t introduce any entropy.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The field <code class="docutils literal notranslate"><span class="pre">hop</span> <span class="pre">count</span></code> is currently ignored, since we’re using the
+Gossip module for spreading those packets in the network. However,
+it would be possible to use it in a future project, where reliance
+on another transport module isn’t possible, or when the Gossip
+module is only used to spread information about existing peers,
+so that the NSE module would try to connect itself to other peers.
+To sum it up, leaving <code class="docutils literal notranslate"><span class="pre">hop</span> <span class="pre">count</span></code> in place was a design decision
+for future extensibility. Same applies to the <code class="docutils literal notranslate"><span class="pre">version</span></code> field.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="configuration.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="codebase/index.html" class="btn btn-neutral float-right" title="Source Code Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christian Plass, Luis Kleinheinz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

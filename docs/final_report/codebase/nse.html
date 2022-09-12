@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nse &mdash; P2P Network Size Estimation  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="persistence" href="persistence.html" />
+    <link rel="prev" title="gossip" href="gossip.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> P2P Network Size Estimation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nse_protocol.html">NSE P2P protocol</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Source Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entrypoint.html">entrypoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gossip.html">gossip</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">nse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="persistence.html">persistence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocols.html">protocols</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">P2P Network Size Estimation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Source Code Documentation</a> &raquo;</li>
+      <li>nse</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/codebase/nse.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-p2p_nse5.nse">
+<span id="nse"></span><span id="code-nse"></span><h1>nse<a class="headerlink" href="#module-p2p_nse5.nse" title="Permalink to this heading"></a></h1>
+<p>Module handling interactions with other NSE API clients and other NSE peers via Gossip</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="p2p_nse5.nse.Protocol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">p2p_nse5.nse.</span></span><span class="sig-name descname"><span class="pre">Protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="config.html#p2p_nse5.config.Configuration" title="p2p_nse5.config.Configuration"><span class="pre">Configuration</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#p2p_nse5.nse.Protocol" title="Permalink to this definition"></a></dt>
+<dd><p>Implementation of the API protocol for the NSE module using the asyncio framework</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>configuration</strong> – package configuration instance for a NSE5 instance</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.nse.Protocol._instance_counter">
+<span class="sig-name descname"><span class="pre">_instance_counter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;generator</span> <span class="pre">object</span> <span class="pre">counter&gt;</span></em><a class="headerlink" href="#p2p_nse5.nse.Protocol._instance_counter" title="Permalink to this definition"></a></dt>
+<dd><p>Simple counter to give every instance of this class a new increasing number</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="p2p_nse5.nse.Protocol.connection_lost">
+<span class="sig-name descname"><span class="pre">connection_lost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#p2p_nse5.nse.Protocol.connection_lost" title="Permalink to this definition"></a></dt>
+<dd><p>Called when the connection is lost or closed.</p>
+<p>The argument is an exception object or None (the latter
+meaning a regular EOF is received or the connection was
+aborted or closed).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="p2p_nse5.nse.Protocol.connection_made">
+<span class="sig-name descname"><span class="pre">connection_made</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transport</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Transport</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#p2p_nse5.nse.Protocol.connection_made" title="Permalink to this definition"></a></dt>
+<dd><p>Handler to be called when a connection is made</p>
+<p>The transport must be an IPv4 or IPv6 transport, depending on
+which kind of API listen address has been configured in
+<a class="reference internal" href="config.html#p2p_nse5.config.NSEConfiguration" title="p2p_nse5.config.NSEConfiguration"><code class="xref py py-class docutils literal notranslate"><span class="pre">p2p_nse5.config.NSEConfiguration</span></code></a>. If
+<a class="reference internal" href="config.html#p2p_nse5.config.NSEConfiguration.enforce_localhost" title="p2p_nse5.config.NSEConfiguration.enforce_localhost"><code class="xref py py-attr docutils literal notranslate"><span class="pre">p2p_nse5.config.NSEConfiguration.enforce_localhost</span></code></a> is set
+and the remote end is no local interface, the connection
+will be closed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>transport</strong> – transport representing the pipe connection</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="p2p_nse5.nse.Protocol.data_received">
+<span class="sig-name descname"><span class="pre">data_received</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#p2p_nse5.nse.Protocol.data_received" title="Permalink to this definition"></a></dt>
+<dd><p>Handler to be called when some data is received by the underlying TCP transport</p>
+<p>This method will first attempt to parse the incoming TCP packet as
+a <code class="docutils literal notranslate"><span class="pre">NSE_QUERY</span></code> API message, since no other messages are
+expected on the protocol’s TCP connection anyways. If this
+fails, the message is silently discarded.</p>
+<p>Then, the database is queried for the most recent rounds
+known to the peer, to calculate the overall network size
+estimate and standard deviation. Those values are then
+returned via the same transport as <code class="docutils literal notranslate"><span class="pre">NSE_ESTIMATE</span></code> message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – incoming raw message (buffer of bytes from the underlying TCP connection)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="p2p_nse5.nse.Protocol.eof_received">
+<span class="sig-name descname"><span class="pre">eof_received</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#p2p_nse5.nse.Protocol.eof_received" title="Permalink to this definition"></a></dt>
+<dd><p>Called when the other end calls write_eof() or equivalent.</p>
+<p>If this returns a false value (including None), the transport
+will close itself.  If it returns a true value, closing the
+transport is up to the protocol.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="p2p_nse5.nse.RoundHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">p2p_nse5.nse.</span></span><span class="sig-name descname"><span class="pre">RoundHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="config.html#p2p_nse5.config.Configuration" title="p2p_nse5.config.Configuration"><span class="pre">Configuration</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">write</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#p2p_nse5.nse.RoundHandler" title="Permalink to this definition"></a></dt>
+<dd><p>Handler class for a single iteration (round) of the GNUnet NSE algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conf</strong> – package configuration instance for a NSE5 instance</p></li>
+<li><p><strong>write</strong> – callable accepting some bytes which should be written
+to the currently active transport to the Gossip API server,
+so that NSE information can be successfully spread in the network</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="p2p_nse5.nse.RoundHandler.run">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#p2p_nse5.nse.RoundHandler.run" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the NSE round handler algorithm based on GNUnet NSE</p>
+<dl class="simple">
+<dt>Rough description of this function:</dt><dd><ol class="arabic simple">
+<li><p>Get the previous network size estimate</p></li>
+<li><p>Wait a delay based on our proximity (lower proximity waits longer)</p></li>
+<li><p>Lookup whether some better proximity for the current round appeared while waiting</p></li>
+<li><p>If we’re worse than the current proximity, return</p></li>
+<li><p>Otherwise announce our own proximity in a valid P2P message to the gossip API</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.nse.get_current_round">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.nse.</span></span><span class="sig-name descname"><span class="pre">get_current_round</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="config.html#p2p_nse5.config.Configuration" title="p2p_nse5.config.Configuration"><span class="pre">Configuration</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#p2p_nse5.nse.get_current_round" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate current round identifier based on a frequency (or config) and the timestamp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freq</strong> – either a frequency (integer as seconds) or the configuration</p></li>
+<li><p><strong>timestamp</strong> – optional timestamp to use (otherwise, use the current UNIX timestamp)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>current round identifier</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.nse.get_delay">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.nse.</span></span><span class="sig-name descname"><span class="pre">get_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_estimate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#p2p_nse5.nse.get_delay" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the initial delay for starting the flood using the formula by Evans et. al.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frequency</strong> – configured network-wide frequency for new size estimate floods</p></li>
+<li><p><strong>proximity</strong> – calculated own proximity in the current round</p></li>
+<li><p><strong>previous_estimate</strong> – network size estimate calculated at the end of the previous round</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.nse.get_remaining_time">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.nse.</span></span><span class="sig-name descname"><span class="pre">get_remaining_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="config.html#p2p_nse5.config.Configuration" title="p2p_nse5.config.Configuration"><span class="pre">Configuration</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#p2p_nse5.nse.get_remaining_time" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the remaining time in the current round based on a frequency (or config) and the timestamp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freq</strong> – either a frequency (integer as seconds) or the configuration</p></li>
+<li><p><strong>timestamp</strong> – optional timestamp to use (otherwise, use the current UNIX timestamp)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>roughly remaining time of the current round in seconds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.nse.get_size_estimate">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.nse.</span></span><span class="sig-name descname"><span class="pre">get_size_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_max_proximity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#p2p_nse5.nse.get_size_estimate" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate a rough estimate of the current network size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>expected_max_proximity</strong> – expected number of max bits of proximity</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>estimated network size (it’s a float, use with care)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.nse.get_start_time">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.nse.</span></span><span class="sig-name descname"><span class="pre">get_start_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="config.html#p2p_nse5.config.Configuration" title="p2p_nse5.config.Configuration"><span class="pre">Configuration</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#p2p_nse5.nse.get_start_time" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the current round’s start time based on a frequency (or config) and the timestamp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freq</strong> – either a frequency (integer as seconds) or the configuration</p></li>
+<li><p><strong>timestamp</strong> – optional timestamp to use (otherwise, use the current UNIX timestamp)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact UNIX timestamp when the current round has begun</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gossip.html" class="btn btn-neutral float-left" title="gossip" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="persistence.html" class="btn btn-neutral float-right" title="persistence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christian Plass, Luis Kleinheinz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

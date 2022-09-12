@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>protocols &mdash; P2P Network Size Estimation  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="utils" href="utils.html" />
+    <link rel="prev" title="persistence" href="persistence.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> P2P Network Size Estimation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nse_protocol.html">NSE P2P protocol</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Source Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entrypoint.html">entrypoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gossip.html">gossip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nse.html">nse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="persistence.html">persistence</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">protocols</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-p2p_nse5.protocols.api">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-p2p_nse5.protocols.p2p">P2P</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">P2P Network Size Estimation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Source Code Documentation</a> &raquo;</li>
+      <li>protocols</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/codebase/protocols.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-p2p_nse5.protocols">
+<span id="protocols"></span><span id="code-protocols"></span><h1>protocols<a class="headerlink" href="#module-p2p_nse5.protocols" title="Permalink to this heading"></a></h1>
+<p>Package containing helper functionality to make use of
+the three different protocols used in this project:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Module <a class="reference internal" href="#module-p2p_nse5.protocols.api" title="p2p_nse5.protocols.api"><code class="xref py py-mod docutils literal notranslate"><span class="pre">protocols.api</span></code></a> is responsible
+for interacting with the other modules of the VoidPhone P2P application
+(e.g. the Gossip module as server or the RPS module as client)</p></li>
+<li><p>Module <a class="reference internal" href="#module-p2p_nse5.protocols.p2p" title="p2p_nse5.protocols.p2p"><code class="xref py py-mod docutils literal notranslate"><span class="pre">protocols.p2p</span></code></a> is responsible
+for handling the protocol messages which are delivered by Gossip
+and are used to spread information about the network size</p></li>
+</ul>
+</div></blockquote>
+<section id="module-p2p_nse5.protocols.api">
+<span id="api"></span><h2>API<a class="headerlink" href="#module-p2p_nse5.protocols.api" title="Permalink to this heading"></a></h2>
+<p>Helper module to provide abstractions for API communications</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.GossipNotification">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.api.</span></span><span class="sig-name descname"><span class="pre">GossipNotification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#p2p_nse5.protocols.api.GossipNotification" title="Permalink to this definition"></a></dt>
+<dd><p>Data class for the four elements an incoming <code class="docutils literal notranslate"><span class="pre">GOSSIP_NOTIFICATION</span></code> holds</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.GossipNotification.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bytes</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.GossipNotification.data" title="Permalink to this definition"></a></dt>
+<dd><p>Arbitrary data (in our case, packed P2P messages for network size info)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.GossipNotification.data_type">
+<span class="sig-name descname"><span class="pre">data_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.GossipNotification.data_type" title="Permalink to this definition"></a></dt>
+<dd><p>Data type of the data in the packet</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.GossipNotification.message_id">
+<span class="sig-name descname"><span class="pre">message_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.GossipNotification.message_id" title="Permalink to this definition"></a></dt>
+<dd><p>Message ID of the incoming packet</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.GossipNotification.size">
+<span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.GossipNotification.size" title="Permalink to this definition"></a></dt>
+<dd><p>Size of the incoming packet</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.InvalidMessage">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.api.</span></span><span class="sig-name descname"><span class="pre">InvalidMessage</span></span><a class="headerlink" href="#p2p_nse5.protocols.api.InvalidMessage" title="Permalink to this definition"></a></dt>
+<dd><p>Exception for invalid API messages (they should simply be ignored)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.api.</span></span><span class="sig-name descname"><span class="pre">MessageType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType" title="Permalink to this definition"></a></dt>
+<dd><p>Enum listing all message types defined in the default API document</p>
+<p>Some of those message types are not used in the current NSE module
+implementation, but they are defined here for the sake of completeness.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_CIPHER_DECRYPT">
+<span class="sig-name descname"><span class="pre">AUTH_CIPHER_DECRYPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">613</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_CIPHER_DECRYPT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_CIPHER_DECRYPT_RESP">
+<span class="sig-name descname"><span class="pre">AUTH_CIPHER_DECRYPT_RESP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">614</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_CIPHER_DECRYPT_RESP" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_CIPHER_ENCRYPT">
+<span class="sig-name descname"><span class="pre">AUTH_CIPHER_ENCRYPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">611</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_CIPHER_ENCRYPT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_CIPHER_ENCRYPT_RESP">
+<span class="sig-name descname"><span class="pre">AUTH_CIPHER_ENCRYPT_RESP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">612</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_CIPHER_ENCRYPT_RESP" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_ERROR">
+<span class="sig-name descname"><span class="pre">AUTH_ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">610</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_ERROR" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_LAYER_DECRYPT">
+<span class="sig-name descname"><span class="pre">AUTH_LAYER_DECRYPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">606</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_LAYER_DECRYPT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_LAYER_DECRYPT_RESP">
+<span class="sig-name descname"><span class="pre">AUTH_LAYER_DECRYPT_RESP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">608</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_LAYER_DECRYPT_RESP" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_LAYER_ENCRYPT">
+<span class="sig-name descname"><span class="pre">AUTH_LAYER_ENCRYPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">605</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_LAYER_ENCRYPT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_LAYER_ENCRYPT_RESP">
+<span class="sig-name descname"><span class="pre">AUTH_LAYER_ENCRYPT_RESP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">607</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_LAYER_ENCRYPT_RESP" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_SESSION_CLOSE">
+<span class="sig-name descname"><span class="pre">AUTH_SESSION_CLOSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">609</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_SESSION_CLOSE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_SESSION_HS1">
+<span class="sig-name descname"><span class="pre">AUTH_SESSION_HS1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">601</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_SESSION_HS1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_SESSION_HS2">
+<span class="sig-name descname"><span class="pre">AUTH_SESSION_HS2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">603</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_SESSION_HS2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_SESSION_INCOMING_HS1">
+<span class="sig-name descname"><span class="pre">AUTH_SESSION_INCOMING_HS1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">602</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_SESSION_INCOMING_HS1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_SESSION_INCOMING_HS2">
+<span class="sig-name descname"><span class="pre">AUTH_SESSION_INCOMING_HS2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">604</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_SESSION_INCOMING_HS2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.AUTH_SESSION_START">
+<span class="sig-name descname"><span class="pre">AUTH_SESSION_START</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">600</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.AUTH_SESSION_START" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.DHT_FAILURE">
+<span class="sig-name descname"><span class="pre">DHT_FAILURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">653</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.DHT_FAILURE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.DHT_GET">
+<span class="sig-name descname"><span class="pre">DHT_GET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">651</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.DHT_GET" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.DHT_PUT">
+<span class="sig-name descname"><span class="pre">DHT_PUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">650</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.DHT_PUT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.DHT_SUCCESS">
+<span class="sig-name descname"><span class="pre">DHT_SUCCESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">652</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.DHT_SUCCESS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ENROLL_FAILURE">
+<span class="sig-name descname"><span class="pre">ENROLL_FAILURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">683</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ENROLL_FAILURE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ENROLL_INIT">
+<span class="sig-name descname"><span class="pre">ENROLL_INIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">680</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ENROLL_INIT" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ENROLL_REGISTER">
+<span class="sig-name descname"><span class="pre">ENROLL_REGISTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">681</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ENROLL_REGISTER" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ENROLL_SUCCESS">
+<span class="sig-name descname"><span class="pre">ENROLL_SUCCESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">682</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ENROLL_SUCCESS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.GOSSIP_ANNOUNCE">
+<span class="sig-name descname"><span class="pre">GOSSIP_ANNOUNCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">500</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.GOSSIP_ANNOUNCE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.GOSSIP_NOTIFICATION">
+<span class="sig-name descname"><span class="pre">GOSSIP_NOTIFICATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">502</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.GOSSIP_NOTIFICATION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.GOSSIP_NOTIFY">
+<span class="sig-name descname"><span class="pre">GOSSIP_NOTIFY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">501</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.GOSSIP_NOTIFY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.GOSSIP_VALIDATION">
+<span class="sig-name descname"><span class="pre">GOSSIP_VALIDATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">503</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.GOSSIP_VALIDATION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.NSE_ESTIMATE">
+<span class="sig-name descname"><span class="pre">NSE_ESTIMATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">521</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.NSE_ESTIMATE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.NSE_QUERY">
+<span class="sig-name descname"><span class="pre">NSE_QUERY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">520</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.NSE_QUERY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ONION_COVER">
+<span class="sig-name descname"><span class="pre">ONION_COVER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">566</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ONION_COVER" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ONION_ERROR">
+<span class="sig-name descname"><span class="pre">ONION_ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">565</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ONION_ERROR" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_BUILD">
+<span class="sig-name descname"><span class="pre">ONION_TUNNEL_BUILD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">560</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_BUILD" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_DATA">
+<span class="sig-name descname"><span class="pre">ONION_TUNNEL_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">564</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_DATA" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_DESTROY">
+<span class="sig-name descname"><span class="pre">ONION_TUNNEL_DESTROY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">563</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_DESTROY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_INCOMING">
+<span class="sig-name descname"><span class="pre">ONION_TUNNEL_INCOMING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">562</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_INCOMING" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_READY">
+<span class="sig-name descname"><span class="pre">ONION_TUNNEL_READY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">561</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.ONION_TUNNEL_READY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.RPS_PEER">
+<span class="sig-name descname"><span class="pre">RPS_PEER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">541</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.RPS_PEER" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.MessageType.RPS_QUERY">
+<span class="sig-name descname"><span class="pre">RPS_QUERY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">540</span></em><a class="headerlink" href="#p2p_nse5.protocols.api.MessageType.RPS_QUERY" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.pack_gossip_announce">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.api.</span></span><span class="sig-name descname"><span class="pre">pack_gossip_announce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#p2p_nse5.protocols.api.pack_gossip_announce" title="Permalink to this definition"></a></dt>
+<dd><p>Pack a <code class="docutils literal notranslate"><span class="pre">GOSSIP_ANNOUNCE</span></code> message</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.pack_gossip_notify">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.api.</span></span><span class="sig-name descname"><span class="pre">pack_gossip_notify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#p2p_nse5.protocols.api.pack_gossip_notify" title="Permalink to this definition"></a></dt>
+<dd><p>Pack a <code class="docutils literal notranslate"><span class="pre">GOSSIP_NOTIFY</span></code> message</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.pack_gossip_validation">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.api.</span></span><span class="sig-name descname"><span class="pre">pack_gossip_validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#p2p_nse5.protocols.api.pack_gossip_validation" title="Permalink to this definition"></a></dt>
+<dd><p>Pack a <code class="docutils literal notranslate"><span class="pre">GOSSIP_VALIDATION</span></code> message</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.pack_nse_estimate">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.api.</span></span><span class="sig-name descname"><span class="pre">pack_nse_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_deviation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#p2p_nse5.protocols.api.pack_nse_estimate" title="Permalink to this definition"></a></dt>
+<dd><p>Pack a <code class="docutils literal notranslate"><span class="pre">NSE_ESTIMATE</span></code> message</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.api.unpack_incoming_message">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.api.</span></span><span class="sig-name descname"><span class="pre">unpack_incoming_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#p2p_nse5.protocols.api.GossipNotification" title="p2p_nse5.protocols.api.GossipNotification"><span class="pre">GossipNotification</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#p2p_nse5.protocols.api.unpack_incoming_message" title="Permalink to this definition"></a></dt>
+<dd><p>Parse, validate and unpack an incoming API message into type and data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> – incoming unchecked message in raw bytes</p></li>
+<li><p><strong>expected_types</strong> – iterable of expected message types</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple of the message type identifier and the
+unpacked value specific to the specific message type</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#p2p_nse5.protocols.api.InvalidMessage" title="p2p_nse5.protocols.api.InvalidMessage"><strong>InvalidMessage</strong></a> – when an unsupported message type was
+detected or when the message is malformed in any way</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-p2p_nse5.protocols.p2p">
+<span id="p2p"></span><h2>P2P<a class="headerlink" href="#module-p2p_nse5.protocols.p2p" title="Permalink to this heading"></a></h2>
+<p>Helper module to provide abstractions for NSE P2P communications</p>
+<p>Take a look at <a class="reference internal" href="../nse_protocol.html#nse-protocol"><span class="std std-ref">NSE P2P protocol</span></a> for more details about the
+structure and layout of the protocol we use in this package.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.p2p.ProtocolMessage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.p2p.</span></span><span class="sig-name descname"><span class="pre">ProtocolMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">round_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hop_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">public_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RsaKey</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#p2p_nse5.protocols.p2p.ProtocolMessage" title="Permalink to this definition"></a></dt>
+<dd><p>Simple dataclass carrying the values of a valid incoming NSE protocol message</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.p2p.ProtocolMessage.hop_count">
+<span class="sig-name descname"><span class="pre">hop_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#p2p_nse5.protocols.p2p.ProtocolMessage.hop_count" title="Permalink to this definition"></a></dt>
+<dd><p>Number of hops the packet travelled (not used while using the Gossip transport)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.p2p.ProtocolMessage.proximity">
+<span class="sig-name descname"><span class="pre">proximity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#p2p_nse5.protocols.p2p.ProtocolMessage.proximity" title="Permalink to this definition"></a></dt>
+<dd><p>Claimed proximity in bits (later checked again by ourselves)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.p2p.ProtocolMessage.public_key">
+<span class="sig-name descname"><span class="pre">public_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">RsaKey</span></em><a class="headerlink" href="#p2p_nse5.protocols.p2p.ProtocolMessage.public_key" title="Permalink to this definition"></a></dt>
+<dd><p>RSA public key as re-assembled from the incoming packet</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.p2p.ProtocolMessage.round_time">
+<span class="sig-name descname"><span class="pre">round_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#p2p_nse5.protocols.p2p.ProtocolMessage.round_time" title="Permalink to this definition"></a></dt>
+<dd><p>Identifier of a NSE round</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.p2p.build_message">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.p2p.</span></span><span class="sig-name descname"><span class="pre">build_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rsa_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RsaKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Logger</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proximity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proof_of_work_bits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hop_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#p2p_nse5.protocols.p2p.build_message" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a binary NSE protocol message from a set of input values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rsa_key</strong> – private and public key pair of a 4096 bit RSA key</p></li>
+<li><p><strong>round_time</strong> – round time which is spread across the network</p></li>
+<li><p><strong>logger</strong> – optional logger to keep track of the PoW calculation time</p></li>
+<li><p><strong>proximity</strong> – optional number of equal leading bits between the
+hash of the round time (target identity) and the key identity;
+it will be generated on demand of not explicitly given</p></li>
+<li><p><strong>proof_of_work_bits</strong> – optional override of the required
+trailing zero bits of the SHA256 hash of the unsigned payload</p></li>
+<li><p><strong>hop_count</strong> – optional override of the default hop count</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>assembled bytes string containing a valid NSE protocol message</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – for invalid RSA key input or when packing of structs failed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.p2p.calculate_proximity">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.p2p.</span></span><span class="sig-name descname"><span class="pre">calculate_proximity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rsa_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RsaKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#p2p_nse5.protocols.p2p.calculate_proximity" title="Permalink to this definition"></a></dt>
+<dd><p>Determine the proximity as number of equal leading bits between the
+RSA public key’s N and some comparison value’s unsalted SHA256 hash</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rsa_key</strong> – RSA public key of at least 1024 bits size</p></li>
+<li><p><strong>value</strong> – some comparison value, usually a representation of the round time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of equal leading bits between the hashed value and the public key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="p2p_nse5.protocols.p2p.unpack_message">
+<span class="sig-prename descclassname"><span class="pre">p2p_nse5.protocols.p2p.</span></span><span class="sig-name descname"><span class="pre">unpack_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_proximity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proof_of_work_bits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#p2p_nse5.protocols.p2p.ProtocolMessage" title="p2p_nse5.protocols.p2p.ProtocolMessage"><span class="pre">ProtocolMessage</span></a></span></span><a class="headerlink" href="#p2p_nse5.protocols.p2p.unpack_message" title="Permalink to this definition"></a></dt>
+<dd><p>Unpack an incoming message as raw bytes string into a <a class="reference internal" href="#p2p_nse5.protocols.p2p.ProtocolMessage" title="p2p_nse5.protocols.p2p.ProtocolMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProtocolMessage</span></code></a> instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> – raw bytes string that has been received as incoming NSE P2P message</p></li>
+<li><p><strong>min_proximity</strong> – minimal proximity; messages with a lower proximity to the
+hash will be discarded before further checks of the content (e.g. signature
+and proof of work) to improve this function’s performance</p></li>
+<li><p><strong>proof_of_work_bits</strong> – optional indicator of the required bits of the proof of work hash</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the unpacked message as a ProtocolMessage instance</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – whenever something is wrong with the message, e.g. the
+signature is invalid, the proof of work hash is invalid or not large
+enough, the header has an invalid format, the message is too small
+or when the claimed proximity doesn’t match the calculated proximity</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="persistence.html" class="btn btn-neutral float-left" title="persistence" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christian Plass, Luis Kleinheinz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

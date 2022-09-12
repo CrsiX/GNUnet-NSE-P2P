@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuration &mdash; P2P Network Size Estimation  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NSE P2P protocol" href="nse_protocol.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> P2P Network Size Estimation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#global-settings">Global settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gossip-settings">Gossip settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nse-settings">NSE settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-module">API module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#database">Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logging">Logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nse-details">NSE details</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nse_protocol.html">NSE P2P protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="codebase/index.html">Source Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">P2P Network Size Estimation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Configuration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/configuration.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration">
+<span id="id1"></span><h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>The configuration of the NSE module is stored in an <a class="reference external" href="https://en.wikipedia.org/wiki/INI_file">INI</a>
+format file. It’s usually named <code class="docutils literal notranslate"><span class="pre">config.ini</span></code>, but that doesn’t matter. A sane default
+configuration looks like the following snippet:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1">; Configuration file for the NSE module 5</span><span class="w"></span>
+
+<span class="c1">; hostkey (path): global setting of the host&#39;s private RSA 4096 bit key file</span><span class="w"></span>
+<span class="na">hostkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">host_key.pem</span><span class="w"></span>
+
+<span class="k">[gossip]</span><span class="w"></span>
+<span class="c1">; api_address (address): listen address of a reachable Gossip</span><span class="w"></span>
+<span class="c1">; instance as IPv4 or IPv6 with port</span><span class="w"></span>
+<span class="na">api_address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">127.0.0.1:5000</span><span class="w"></span>
+
+<span class="k">[nse]</span><span class="w"></span>
+<span class="c1">; api_address (address): listen address for the NSE server as IPv4 or IPv6 with port</span><span class="w"></span>
+<span class="na">api_address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">127.0.0.1:6000</span><span class="w"></span>
+
+<span class="c1">; database (connection URL): full database connection string used to</span><span class="w"></span>
+<span class="c1">; configure SQLAlchemy (take a look at the docs for details, here:</span><span class="w"></span>
+<span class="c1">; https://docs.sqlalchemy.org/en/14/core/connections.html)</span><span class="w"></span>
+<span class="na">database</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">sqlite:///./nse.db</span><span class="w"></span>
+
+<span class="c1">; enforce_localhost (bool): security switch to block any incoming API</span><span class="w"></span>
+<span class="c1">; connection which doesn&#39;t originate from a local device (localhost)</span><span class="w"></span>
+<span class="na">enforce_localhost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="w"></span>
+
+<span class="c1">; Following are logging settings which should have sane defaults</span><span class="w"></span>
+
+<span class="c1">; log_file (filename or &#39;-&#39;): destination for new log records</span><span class="w"></span>
+<span class="na">log_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">-</span><span class="w"></span>
+
+<span class="c1">; log_level (log level): minimum log level which should be visible in log files</span><span class="w"></span>
+<span class="na">log_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">DEBUG</span><span class="w"></span>
+
+<span class="c1">; log_format (template string): format of a single log message</span><span class="w"></span>
+<span class="c1">; (see https://docs.python.org/3/library/logging.config.html for details)</span><span class="w"></span>
+<span class="na">log_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{asctime}: [{levelname:&lt;8}] {name}: {message}</span><span class="w"></span>
+
+<span class="c1">; log_style (&#39;%&#39; or &#39;{&#39;): determine the style for the previous format string</span><span class="w"></span>
+<span class="na">log_style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">{</span><span class="w"></span>
+
+<span class="c1">; log_dateformat (template string): format of datetime information in</span><span class="w"></span>
+<span class="c1">; log records (use double percent for escaping, e.g. &#39;%%&#39;)</span><span class="w"></span>
+<span class="na">log_dateformat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">%%d.%%m.%%Y %%H:%%M:%%S</span><span class="w"></span>
+
+<span class="c1">; Following are NSE protocol design choices, which MUST be consistent</span><span class="w"></span>
+<span class="c1">; across all instances that want to communicate successfully</span><span class="w"></span>
+
+<span class="c1">; data_type (int &gt; 0, &lt; 65536): type identifier used for this NSE module while</span><span class="w"></span>
+<span class="c1">; talking with Gossip services that spread its information in the network</span><span class="w"></span>
+<span class="na">data_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">31337</span><span class="w"></span>
+
+<span class="c1">; data_gossip_ttl (int &gt; 0): time to live (TTL) counter for NSE packets used</span><span class="w"></span>
+<span class="c1">; while talking with Gossip services which spread information in the network</span><span class="w"></span>
+<span class="na">data_gossip_ttl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">64</span><span class="w"></span>
+
+<span class="c1">; frequency (int &gt; 0): the time of a single GNUnet NSE round in seconds</span><span class="w"></span>
+<span class="na">frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1800</span><span class="w"></span>
+
+<span class="c1">; respected_rounds (int &gt; 0): number of rounds to use in the calculation of</span><span class="w"></span>
+<span class="c1">; the approximated network size and concerned in the standard deviation</span><span class="w"></span>
+<span class="na">respected_rounds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">8</span><span class="w"></span>
+
+<span class="c1">; max_backlog_rounds (int &gt;= 0): max number of rounds in which</span><span class="w"></span>
+<span class="c1">; incoming NSE packets from the future are accepted</span><span class="w"></span>
+<span class="na">max_backlog_rounds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2</span><span class="w"></span>
+
+<span class="c1">; proof_of_work_bits (int &gt; 0): minimum number of leading zero bits in the</span><span class="w"></span>
+<span class="c1">; SHA256 hash of the P2P NSE protocol header as proof of work</span><span class="w"></span>
+<span class="na">proof_of_work_bits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">20</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Download the default configuration file
+<a class="reference download internal" download="" href="_downloads/cc6361549e683f8c868d3688f74a7bbe/default_configuration.ini"><code class="xref download docutils literal notranslate"><span class="pre">default_configuration.ini</span></code></a>
+and adopt it to your needs before starting the program.</p>
+<p>The configuration file may contain more key-value pairs which aren’t listed
+on the following page. Those will be ignored and won’t raise any errors.</p>
+<section id="global-settings">
+<h2>Global settings<a class="headerlink" href="#global-settings" title="Permalink to this heading"></a></h2>
+<p>There may be a top-level section called <code class="docutils literal notranslate"><span class="pre">global</span></code> which contains the single key
+<code class="docutils literal notranslate"><span class="pre">hostkey</span></code>. It contains the path to a RSA 4096-bit public &amp; private key pair
+stored in PEM format. If the section <code class="docutils literal notranslate"><span class="pre">global</span></code> is absent, this key must be
+the very first entry in the configuration file. Otherwise parsing it may fail.</p>
+</section>
+<section id="gossip-settings">
+<h2>Gossip settings<a class="headerlink" href="#gossip-settings" title="Permalink to this heading"></a></h2>
+<p>The Gossip section may provide any number of key-value pairs. The only key required
+by the NSE module is the <code class="docutils literal notranslate"><span class="pre">api_address</span></code>. It stores an IP address and port where
+a running Gossip module can be reached. That network address should be given as
+<code class="docutils literal notranslate"><span class="pre">&lt;ip_address&gt;:&lt;port&gt;</span></code>. Use <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code> to separate the address from port number
+in case of an IPv6 address, for example <code class="docutils literal notranslate"><span class="pre">[2001:4ca0:2001:11:226:b9ff:fe7d:84ed]:6001</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The NSE module heavily depends on the Gossip module to distribute its
+messages in the network. In case the Gossip module is unreachable at
+startup, the program will terminate. If the connection suddenly drops, the
+NSE module will try to reconnect to it permanently, but it can’t provide new
+information about the network size (therefore using the most recent values).</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Currently, using hostnames instead of IP addresses doesn’t work reliably.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Support for IPv6 addresses is not as tested as support for IPv4 addresses.</p>
+</div>
+</section>
+<section id="nse-settings">
+<h2>NSE settings<a class="headerlink" href="#nse-settings" title="Permalink to this heading"></a></h2>
+<section id="api-module">
+<h3>API module<a class="headerlink" href="#api-module" title="Permalink to this heading"></a></h3>
+<p>The most important key-value pair required by the NSE module is the <code class="docutils literal notranslate"><span class="pre">api_address</span></code>.
+It stores an IP address and port which should be used to listen for incoming API
+connections (and therefore, <code class="docutils literal notranslate"><span class="pre">NSE_QUERY</span></code> messages). That network address should be given as
+<code class="docutils literal notranslate"><span class="pre">&lt;ip_address&gt;:&lt;port&gt;</span></code>. Use <code class="docutils literal notranslate"><span class="pre">[</span></code> and <code class="docutils literal notranslate"><span class="pre">]</span></code> to separate the address from port number
+in case of an IPv6 address, for example <code class="docutils literal notranslate"><span class="pre">[2001:4ca0:2001:11:226:b9ff:fe7d:84ed]:6001</span></code>.</p>
+<p>There exists a security switch <code class="docutils literal notranslate"><span class="pre">enforce_localhost</span></code> which prevents any non-local
+IP address from communicating with the NSE module. Incoming non-local TCP
+connections are directly closed without further notice or response when it’s active.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Currently, using hostnames instead of IP addresses doesn’t work reliably.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Support for IPv6 addresses is not as tested as support for IPv4 addresses.</p>
+</div>
+</section>
+<section id="database">
+<h3>Database<a class="headerlink" href="#database" title="Permalink to this heading"></a></h3>
+<p>The database configuration is required in order to properly store peer
+identities and history information persistently. The program has been
+tested with SQLite and MariaDB databases, but everything supported
+by SQLAlchemy should work. There’s a key <code class="docutils literal notranslate"><span class="pre">database</span></code> which must be the
+correct and full database URL (“connection string”) to the database
+used by this module. See the explanation about database URLs in the
+<a class="reference external" href="https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls">SQLAlchemy docs</a>
+for more information or head directly to the specification of them in
+<a class="reference external" href="https://rfc.net/rfc1738.html">RFC 1738</a> (examples of such connection
+strings are <code class="docutils literal notranslate"><span class="pre">sqlite:///./nse.db</span></code> and <code class="docutils literal notranslate"><span class="pre">mysql://user:password&#64;localhost/nse</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Here’s a list of some suggested external drivers for various databases:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/sqlite3.html">sqlite3</a>
+comes pre-installed with the Python standard library</p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/PyMySQL">pymysql</a> is a pure-Python MySQL driver</p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/mysqlclient">mysqlclient</a>
+is a MySQL driver using the MySQL C libraries</p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/psycopg2">psycopg2</a> is the most popular
+database driver for PostgreSQL</p></li>
+</ul>
+</div></blockquote>
+</div>
+</section>
+<section id="logging">
+<h3>Logging<a class="headerlink" href="#logging" title="Permalink to this heading"></a></h3>
+<p>There are a set of logging options which can be tweaked. Refer to the
+<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.basicConfig">Python documentation</a>
+for more details about the meaning of the available options:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">log_file</span></code> equals <code class="docutils literal notranslate"><span class="pre">filename</span></code>, but it also accepts <code class="docutils literal notranslate"><span class="pre">-</span></code> to use
+stdout instead of a dedicated log file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_level</span></code> equals <code class="docutils literal notranslate"><span class="pre">level</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_style</span></code> equals <code class="docutils literal notranslate"><span class="pre">style</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_format</span></code> equals <code class="docutils literal notranslate"><span class="pre">format</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_dateformat</span></code> equals <code class="docutils literal notranslate"><span class="pre">datefmt</span></code></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="nse-details">
+<h3>NSE details<a class="headerlink" href="#nse-details" title="Permalink to this heading"></a></h3>
+<p>There are a bunch of details which can be configured via the
+INI-style configuration file, but which <strong>MUST</strong> be synchronized
+across <strong>all</strong> NSE instances that want to communicate with each
+other successfully. Those are the NSE design parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">data_type</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_gossip_ttl</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frequency</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">respected_rounds</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_backlog_rounds</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">proof_of_work_bits</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>Take a look at the default configuration for further explanation.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nse_protocol.html" class="btn btn-neutral float-right" title="NSE P2P protocol" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christian Plass, Luis Kleinheinz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

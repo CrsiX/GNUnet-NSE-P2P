@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &mdash; P2P Network Size Estimation  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="prev" title="Documentation for P2P Network Size Estimation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> P2P Network Size Estimation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#system-requirements">System requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#database-configuration">Database configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-instructions">Installation instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#execution">Execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#systemd-service">Systemd service</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nse_protocol.html">NSE P2P protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="codebase/index.html">Source Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">P2P Network Size Estimation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Installation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="system-requirements">
+<h2>System requirements<a class="headerlink" href="#system-requirements" title="Permalink to this heading"></a></h2>
+<p>Around 70 MiB of RAM and a single CPU core are fine
+to run the NSE module, but the more the better.</p>
+<p>This project was developed under and tested with Debian GNU/Linux. It might
+work with other operating systems of the Linux family as well as other
+UNIX systems, as long as those support the required libraries. We do not
+“officially” support Windows and Mac OS and have no plans to do so.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading"></a></h2>
+<p>It’s recommended to use another system user with almost no privileges
+to run the module for security purposes, e.g. <code class="docutils literal notranslate"><span class="pre">nse</span></code> or <code class="docutils literal notranslate"><span class="pre">nse5</span></code>.
+Choose a name and stick to it during this setup. A simple tool to
+create a new user on a Debian-like machine is <code class="docutils literal notranslate"><span class="pre">adduser</span></code>.</p>
+<p>You need to have at least <a class="reference external" href="https://www.python.org/downloads">Python 3.9</a>
+with <code class="docutils literal notranslate"><span class="pre">pip</span></code> and <code class="docutils literal notranslate"><span class="pre">venv</span></code> installed on your system. Those can be installed
+using <code class="docutils literal notranslate"><span class="pre">apt</span> <span class="pre">install</span> <span class="pre">python3-pip</span> <span class="pre">python3-venv</span></code> on Debian-like systems and
+using <code class="docutils literal notranslate"><span class="pre">dnf</span> <span class="pre">install</span> <span class="pre">python3-pip</span></code> on Fedora-like systems.</p>
+<p>Even though the API works with a single SQLite database, it’s highly
+recommended to utilize a deployment-grade database server. MySQL and MariaDB
+are currently “officially” supported, but all SQL database backends with
+drivers for <code class="docutils literal notranslate"><span class="pre">sqlalchemy</span></code> should be fine, too.</p>
+<p>Additionally, you either need <code class="docutils literal notranslate"><span class="pre">git</span></code> or download the project files as archive.</p>
+</section>
+<section id="database-configuration">
+<h2>Database configuration<a class="headerlink" href="#database-configuration" title="Permalink to this heading"></a></h2>
+<p>For a SQLite database, the following steps are not required.</p>
+<p>Log into your database server. It requires an account that can create
+users, databases and set privileges. You can choose any user and database name
+you want. <strong>Do not forget to change the password of the new database user!</strong>
+For a MySQL / MariaDB server, the following snippet should do the trick:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">&#39;nse5&#39;</span><span class="o">@</span><span class="n">localhost</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;password&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">nse5_db</span><span class="p">;</span><span class="w"></span>
+<span class="k">GRANT</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">nse5_db</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;nse5&#39;</span><span class="o">@</span><span class="n">localhost</span><span class="p">;</span><span class="w"></span>
+<span class="n">FLUSH</span><span class="w"> </span><span class="k">PRIVILEGES</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+<p>In case you want to be able to perform unittests with the database,
+you should also create a second database and call it something like
+<code class="docutils literal notranslate"><span class="pre">nse5_test</span></code> or so, because it may be cleared by the unittests.</p>
+</section>
+<section id="installation-instructions">
+<h2>Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this heading"></a></h2>
+<p>The following steps should be executed as your target user (e.g. <code class="docutils literal notranslate"><span class="pre">nse</span></code> or <code class="docutils literal notranslate"><span class="pre">nse5</span></code>).</p>
+<ol class="arabic">
+<li><p>Clone the repository or copy the whole project to your server and <code class="docutils literal notranslate"><span class="pre">cd</span></code> into it.</p></li>
+<li><p>Create and enable a virtual environment for the Python packages:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="n">venv</span>
+<span class="n">source</span> <span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Install the minimally required Python packages:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We don’t enforce any database drivers as dependencies in the
+<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file. The database driver must be installed extra.
+We “officially” support SQLite and MySQL / MariaDB, but everything
+supported by <a class="reference external" href="https://docs.sqlalchemy.org/en/14/dialects">SQLAlchemy</a>
+may work. See <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a> for more information.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On Alpine Linux, you need the additional packages <code class="docutils literal notranslate"><span class="pre">gcc</span></code>, <code class="docutils literal notranslate"><span class="pre">g++</span></code> and
+<code class="docutils literal notranslate"><span class="pre">libc-dev</span></code>. On Debian GNU/Linux, you may need the <code class="docutils literal notranslate"><span class="pre">build-essential</span></code> package.</p>
+</div>
+</div></blockquote>
+</li>
+<li><p>Choose a configuration filename, e.g. <code class="docutils literal notranslate"><span class="pre">config.ini</span></code>, and create a new config file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">p2p_nse5</span> <span class="n">new</span> <span class="o">-</span><span class="n">c</span> <span class="n">config</span><span class="o">.</span><span class="n">ini</span>
+</pre></div>
+</div>
+</li>
+<li><p>Edit the newly created configuration file <code class="docutils literal notranslate"><span class="pre">config.ini</span></code>.
+Refer to <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a> for more information about
+available options and their meaning. To get started quickly,
+it’s enough to just configure the following values:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the path to the host key file (RSA 4096-bit private key in PEM format)</p></li>
+<li><p>the API address of the Gossip module</p></li>
+<li><p>the API address of the NSE module</p></li>
+<li><p>the database connection string (if omitted, a temporary SQLite will be used)</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you don’t have a RSA 4096-bit private key yet, you can generate a
+fresh one with the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">p2p_nse5</span> <span class="n">generate</span> <span class="o">&lt;</span><span class="n">path</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Do not re-use any private key previously used in other projects!</strong></p>
+</div>
+</li>
+</ol>
+</section>
+<section id="execution">
+<h2>Execution<a class="headerlink" href="#execution" title="Permalink to this heading"></a></h2>
+<p>You can now easily start the NSE module and API using the <code class="docutils literal notranslate"><span class="pre">run</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -m p2p_nse5 run --help
+usage: p2p_nse5 run [-h] [-c &lt;file&gt;] [-d &lt;URL&gt;] [-g &lt;address&gt;] [-l &lt;address&gt;] [-p &lt;file&gt;]
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -c &lt;file&gt;     configuration filename (defaults to &#39;default_configuration.ini&#39;)
+  -d &lt;URL&gt;      overwrite full database connection string
+  -g &lt;address&gt;  overwrite address of the Gossip API server
+  -l &lt;address&gt;  overwrite local API listen address
+  -p &lt;file&gt;     overwrite path to the RSA private key
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">p2p_nse5</span> <span class="n">run</span>
+</pre></div>
+</div>
+</section>
+<section id="systemd-service">
+<h2>Systemd service<a class="headerlink" href="#systemd-service" title="Permalink to this heading"></a></h2>
+<p>On systemd-enabled systems, it’s recommended to add a systemd service
+to start the NSE module API automatically. A sample unit file for systemd
+is shown below. Note that since the NSE module requires the Gossip module
+to be reachable at startup, it should have a dependency for the other
+service. Don’t blindly copy this example, make sure that it fits your needs:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[Unit]</span><span class="w"></span>
+<span class="na">Description</span><span class="o">=</span><span class="s">P2P NSE(5) module API</span><span class="w"></span>
+<span class="na">After</span><span class="o">=</span><span class="s">network-online.target p2p-gossip.service</span><span class="w"></span>
+<span class="na">Wants</span><span class="o">=</span><span class="s">network-online.target p2p-gossip.service</span><span class="w"></span>
+
+<span class="k">[Service]</span><span class="w"></span>
+<span class="na">Type</span><span class="o">=</span><span class="s">simple</span><span class="w"></span>
+<span class="na">ExecStart</span><span class="o">=</span><span class="s">/srv/NSE-5/venv/bin/python3 -m p2p_nse5 run -c config.ini</span><span class="w"></span>
+<span class="na">User</span><span class="o">=</span><span class="s">nse5</span><span class="w"></span>
+<span class="na">WorkingDirectory</span><span class="o">=</span><span class="s">/srv/NSE-5</span><span class="w"></span>
+<span class="na">Restart</span><span class="o">=</span><span class="s">always</span><span class="w"></span>
+<span class="na">SyslogIdentifier</span><span class="o">=</span><span class="s">p2p-nse5</span><span class="w"></span>
+
+<span class="k">[Install]</span><span class="w"></span>
+<span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Documentation for P2P Network Size Estimation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christian Plass, Luis Kleinheinz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
