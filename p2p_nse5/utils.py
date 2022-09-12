@@ -5,15 +5,15 @@ Module with various different utilities
 import socket
 import argparse
 import ipaddress
-from typing import List, Optional, Tuple
+from typing import Tuple
 
 import pydantic
-import sqlalchemy.orm
 
-from . import config, persistence
+from . import config
 
 
 def counter(start: int = 0):
+    """Simple generator for natural numbers"""
     n = start
     while True:
         n += 1
@@ -21,6 +21,12 @@ def counter(start: int = 0):
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
+    """
+    Get the argument parser for the module's CLI utility
+
+    :return: argument parser
+    """
+
     def add_conf_option(p: argparse.ArgumentParser) -> argparse.ArgumentParser:
         p.add_argument(
             "-c",
@@ -68,7 +74,7 @@ def split_ip_address_and_port(value: str, require_localhost: bool = False) -> Tu
     Validate that a given string conforms to the specific IP and port layout
     and split it into address family, IP address string and port number
 
-    This layout uses `{ipv4}:{port}` or `[{ipv6}]:{port}`.
+    This layout uses ``{ipv4}:{port}`` or ``[{ipv6}]:{port}``.
 
     :param value: string to check for layout validity
     :param require_localhost: switch to enforce a IPv4 or IPv6 localhost address
@@ -96,16 +102,3 @@ def split_ip_address_and_port(value: str, require_localhost: bool = False) -> Tu
         if require_localhost and not ipaddress.IPv4Address(ip).is_loopback:
             raise ValueError(f"IPv4 {ip} is no address of localhost")
         return socket.AF_INET, ip, port
-
-
-def get_rounds(
-        session: sqlalchemy.orm.Session,
-        round_id: int,
-        backlog: Optional[bool] = None
-) -> List[persistence.Round]:
-    # TODO: Docstring
-    if backlog is None:
-        rs = session.query(persistence.Round).filter_by(round=round_id).all()
-    else:
-        rs = session.query(persistence.Round).filter_by(round=round_id, backlog=backlog).all()
-    return list(sorted(rs, key=lambda o: int(o.proximity), reverse=True))
