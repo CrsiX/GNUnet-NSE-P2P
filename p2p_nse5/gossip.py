@@ -114,9 +114,6 @@ class Protocol(asyncio.Protocol):
 
                 model = session.query(persistence.Round).filter_by(round=current_round).first()
                 if model is not None:
-                    # TODO: Should we also answer with an immediate update indicating a higher
-                    #  proximity to the specified peer? This is only possible if our NSE module
-                    #  had its own P2P connectivity to other peers in the network.
                     if model.proximity >= notification.proximity:
                         self.logger.debug(f"Too low proximity {notification.proximity} (best: {model.proximity})")
                         self.transport.write(api.pack_gossip_validation(value.message_id, False))

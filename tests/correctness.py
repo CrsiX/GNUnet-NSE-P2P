@@ -24,7 +24,7 @@ class NSETests(utils.GossipEnabledTests):
     def count(self) -> int:
         if hasattr(self, "_count"):
             return self._count
-        self._count = random.randint(5, 10) * os.cpu_count()
+        self._count = min(100, random.randint(5, 10) * os.cpu_count())
         return self._count
 
     def setUp(self) -> None:

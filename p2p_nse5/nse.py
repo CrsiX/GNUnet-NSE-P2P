@@ -163,8 +163,6 @@ class RoundHandler:
             rounds = session.query(persistence.Round).filter_by(round=self._current_round - 1).all()
             if len(rounds) > 0:
                 previous_estimate = get_size_estimate(rounds[0].proximity)
-            # TODO: Optional improvement: store the past estimates in the database,
-            #  then this lookup doesn't only depend on the very last round (use a new table!)
 
         delay = get_delay(self._conf.nse.frequency, self._own_proximity, previous_estimate)
         self.logger.debug(f"Starting... (round={self._current_round}, proximity={self._own_proximity}, delay={delay})")
