@@ -29,6 +29,17 @@ class NSETests(utils.GossipEnabledTests):
         self._count = min(100, random.randint(5, 10) * os.cpu_count())
         return self._count
 
+    @staticmethod
+    def _wait_for_subprocesses():
+        queue = []
+        while queue:
+            p = queue.pop(0)
+            try:
+                utils.query_nse(("127.0.0.1", p))
+            except ConnectionRefusedError:
+                queue.append(p)
+                time.sleep(0.05)
+
     def setUp(self) -> None:
         super().setUp()
         self._running = False
@@ -101,6 +112,7 @@ class SingleTests(NSETests):
             session.commit()
 
     def test_valid_responses(self):
+        self._wait_for_subprocesses()
         db = self.subprocesses[0][2]
         self.assertEqual((0, 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
         init(db, False)
@@ -119,6 +131,7 @@ class SingleTests(NSETests):
         self.assertEqual((20, 1), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
 
     def test_simple_responses(self):
+        self._wait_for_subprocesses()
         db = self.subprocesses[0][2]
         self.assertEqual((0, 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
         init(db, False)
@@ -127,11 +140,11 @@ class SingleTests(NSETests):
             session.commit()
         for i in [(0, 2), (1, 3), (2, 5), (3, 6), (4, 8)]:
             self._add(i[0], 1, 1)
-            print(i)
             self.assertEqual((i[1], 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
 
 
 class ExecutionTests(NSETests):
     def test_execution(self):
+        self._wait_for_subprocesses()
         for port in [e[0] for e in self.subprocesses]:
             self.assertEqual((0, 0), utils.query_nse(("127.0.0.1", port)))
