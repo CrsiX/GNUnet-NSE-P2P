@@ -35,6 +35,17 @@ concatenation of all those five fields. If that hash has it's first `x` bits
 set to zero, the proof of work is valid (where `x` is a natural number between
 0 and 255).
 
+In the original `GNUnet NSE specification <https://grothoff.org/christian/rrsize2012.pdf>`_,
+the proof of work hash was solely calculated using the peer's identity (the public
+key). This makes pre-computing hash collisions easier. Therefore, we're hashing the
+previously mentioned five fields to eliminate the possibility to effectively
+pre-calculate large amounts of those hashes, since they change for every round.
+
+Note that we're not using string representations for the "key" the proximity is
+calculated against. The paper used formatted times, e.g. ``DD-MM-YYYY HH:00:00``.
+We're just using the start of a round as UNIX timestamp, since it gets hashed
+with SHA256 anyways and using the string doesn't introduce any entropy.
+
 .. note::
 
     The field ``hop count`` is currently ignored, since we're using the
