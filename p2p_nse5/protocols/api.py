@@ -1,3 +1,7 @@
+"""
+Helper module to provide abstractions for API communications
+"""
+
 import enum
 import struct
 import dataclasses
@@ -66,26 +70,38 @@ class InvalidMessage(Exception):
 
 @dataclasses.dataclass
 class GossipNotification:
+    """
+    Data class for the four elements an incoming ``GOSSIP_NOTIFICATION`` holds
+    """
+
     size: int
+    """Size of the incoming packet"""
     message_id: int
+    """Message ID of the incoming packet"""
     data_type: int
+    """Data type of the data in the packet"""
     data: bytes
+    """Arbitrary data (in our case, packed P2P messages for network size info)"""
 
 
 def pack_gossip_announce(data_type: int, data: bytes, ttl: int) -> bytes:
+    """Pack a ``GOSSIP_ANNOUNCE`` message"""
     header = struct.Struct("!HHBxH").pack(8 + len(data), MessageType.GOSSIP_ANNOUNCE, ttl, data_type)
     return header + data
 
 
 def pack_gossip_notify(data_type: int) -> bytes:
+    """Pack a ``GOSSIP_NOTIFY`` message"""
     return struct.Struct("!HHHH").pack(8, MessageType.GOSSIP_NOTIFY, 0, data_type)
 
 
 def pack_gossip_validation(message_id: int, valid: bool) -> bytes:
+    """Pack a ``GOSSIP_VALIDATION`` message"""
     return struct.Struct("!HHHH").pack(8, MessageType.GOSSIP_VALIDATION, message_id, int(valid))
 
 
 def pack_nse_estimate(peers: int, std_deviation: int) -> bytes:
+    """Pack a ``NSE_ESTIMATE`` message"""
     return struct.Struct("!HHII").pack(12, MessageType.NSE_ESTIMATE, peers, std_deviation)
 
 

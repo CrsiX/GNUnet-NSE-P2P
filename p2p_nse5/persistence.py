@@ -1,5 +1,8 @@
 """
 Database models and functions using SQLAlchemy
+
+:func:`init` needs to be called at an early program stage.
+Afterwards, :func:`get_new_session` can be used to handle database operations.
 """
 
 import random
@@ -71,11 +74,12 @@ def init(database_url: str, create_all: bool = True):
     This function should be called at a very early program stage, before
     any part of it tries to access the database. If this isn't done,
     a temporary database will be used instead, which may be useful for
-    debugging, too. See the ``DEFAULT_DATABASE_URL`` value for details
+    debugging, too. See the :const:`DEFAULT_DATABASE_URL` value for details
     about the default connection. Without initialization prior to database
     usage, a warning will be emitted once to prevent future errors.
 
-    :param database_url: the full URL to connect to the database
+    :param database_url: the full URL to connect to the database (see
+        https://docs.sqlalchemy.org/en/14/core/connections.html for details)
     :param create_all: whether the metadata of the declarative base should
         be used to create all non-existing tables in the database
     """

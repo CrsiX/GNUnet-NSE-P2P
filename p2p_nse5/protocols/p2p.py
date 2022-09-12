@@ -1,3 +1,10 @@
+"""
+Helper module to provide abstractions for NSE P2P communications
+
+Take a look at :ref:`nse_protocol` for more details about the
+structure and layout of the protocol we use in this package.
+"""
+
 import math
 import time
 import struct
@@ -36,9 +43,13 @@ class ProtocolMessage:
     """
 
     round_time: int
+    """Identifier of a NSE round"""
     proximity: int
+    """Claimed proximity in bits (later checked again by ourselves)"""
     hop_count: int
+    """Number of hops the packet travelled (not used while using the Gossip transport)"""
     public_key: RSA.RsaKey
+    """RSA public key as re-assembled from the incoming packet"""
 
 
 def _check_proof_of_work(required_bits: int, body: bytes) -> bool:

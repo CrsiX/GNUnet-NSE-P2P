@@ -23,6 +23,7 @@ Table of contents
 
     installation
     configuration
+    nse_protocol
     codebase/index
     license
 
