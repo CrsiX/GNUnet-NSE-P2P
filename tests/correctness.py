@@ -5,6 +5,8 @@ import random
 import string
 import subprocess
 
+from p2p_nse5.persistence import init, get_new_session, Peer, Round
+
 from . import utils
 
 
@@ -87,6 +89,48 @@ class NSETests(utils.GossipEnabledTests):
         super().tearDown()
 
 
+class SingleTests(NSETests):
+    def setUp(self) -> None:
+        self._count = 1
+        super().setUp()
+
+    @staticmethod
+    def _add(round_id, proximity, peer_id):
+        with get_new_session() as session:
+            session.add(Round(round=round_id, proximity=proximity, peer_id=peer_id))
+            session.commit()
+
+    def test_valid_responses(self):
+        db = self.subprocesses[0][2]
+        self.assertEqual((0, 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
+        init(db, False)
+        with get_new_session() as session:
+            session.add(Peer(public_key=b"foo", interactions=0))
+            session.add(Peer(public_key=b"bar", interactions=0))
+            session.add(Peer(public_key=b"baz", interactions=0))
+            session.commit()
+        self._add(0, 2, 1)
+        self.assertEqual((3, 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
+        self._add(1, 2, 2)
+        self.assertEqual((6, 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
+        self._add(2, 0, 2)
+        self.assertEqual((7, 1), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
+        self._add(3, 4, 3)
+        self.assertEqual((20, 1), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
+
+    def test_simple_responses(self):
+        db = self.subprocesses[0][2]
+        self.assertEqual((0, 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
+        init(db, False)
+        with get_new_session() as session:
+            session.add(Peer(public_key=b"foo", interactions=0))
+            session.commit()
+        for i in [(0, 2), (1, 3), (2, 5), (3, 6), (4, 8)]:
+            self._add(i[0], 1, 1)
+            print(i)
+            self.assertEqual((i[1], 0), utils.query_nse(("127.0.0.1", self.subprocesses[0][0])))
+
+
 class CorrectnessTests(NSETests):
     def setUp(self) -> None:
         self._config_path = utils.find_path([
@@ -107,4 +151,4 @@ class CorrectnessTests(NSETests):
 class ExecutionTests(NSETests):
     def test_execution(self):
         for port in [e[0] for e in self.subprocesses]:
-            utils.query_nse(("127.0.0.1", port))
+            self.assertEqual((0, 0), utils.query_nse(("127.0.0.1", port)))
